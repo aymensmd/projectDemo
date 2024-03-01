@@ -6,20 +6,18 @@ import NotFound from "./views/NotFound";
 import DefaultLayout from "./components/DefaultLayout";
 import GuestLayout from "./components/GuestLayout";
 import Dashboard from "./views/Dashboard";
-
+import React from "react";
+import  App  from "./App";
 const router = createBrowserRouter([
   {
     path: '/',
     element: <DefaultLayout />,
     children: [
       {
-        index: true,
-        element: <Navigate to="/users" />,
+        path: '/dashboard',
+        element: <App />,
       },
-      {
-        path: 'dashboard',
-        element: <Dashboard />,
-      },
+     
     ],
   },
   {
@@ -43,6 +41,11 @@ const router = createBrowserRouter([
   {
     path: '*',
     element: <NotFound />,
+  },
+  
+  { 
+    path: 'dashboard1',
+    element: <Dashboard />,
   },
 ]);
 

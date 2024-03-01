@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Input, Button, message } from 'antd';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, Card } from 'antd';
 
 
 export default function SignUp() {
@@ -42,6 +42,9 @@ export default function SignUp() {
 
   return (
     <ConfigProvider form={{ validateMessages: { required: 'Please input ${label}!' } }}>
+      <Card >
+      <h2 style={{ color: "#1677ff" }}>Sign Up!</h2>
+   
       <Form
         name="register"
         labelCol={{
@@ -140,6 +143,8 @@ export default function SignUp() {
           </div>
         </Form.Item>
       </Form>
+      </Card>
+      
     </ConfigProvider>
   );
 };

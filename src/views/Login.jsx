@@ -1,44 +1,41 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Button, Card, Checkbox, Form, Input, message } from 'antd';
 import { Link, useNavigate } from 'react-router-dom'; 
 
 import axios from 'axios';
 
 export default function Login() {
-  const navigate = useNavigate(); 
-
-  const onAuthenticate = () => {
-    // Logic to execute after authentication
-    console.log('User authenticated');
-  };
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const onFinish = async (values) => {
     try {
+      setLoading(true);
+
       const response = await axios.post('http://127.0.0.1:8000/api/login', {
         email: values.email,
         password: values.password,
       });
-  
+
       console.log('Authentication successful', response.data);
-  
+
       localStorage.setItem('token', response.data.token);
-  
-      // Redirect to the dashboard upon successful authentication
-      navigate('/dashboard');
-  
+console.log(response.data.token)
+     
+      navigate('/users');
+
       message.success('Authentication successful');
     } catch (error) {
       console.error('Authentication failed', error);
-      message.error('Authentication failed');
+      message.error('Authentication failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
     }
   };
-
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
-
   return (
     <Card>
+      <h2 style={{ color: "#1677ff" }}>Sign Up!</h2>
+      <br/>
       <Form
         name="basic"
         labelCol={{
@@ -54,7 +51,7 @@ export default function Login() {
           remember: true,
         }}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+        
         autoComplete="off"
       >
         <Form.Item
@@ -101,7 +98,7 @@ export default function Login() {
           }}
         >
           <Button type="primary" htmlType="submit">
-            Submit
+             submit
           </Button>
           <div style={{ marginTop: 10 }}>
             Don't have an account? <Link to="/signup">Signup</Link>
