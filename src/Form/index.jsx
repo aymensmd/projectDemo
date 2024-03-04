@@ -3,6 +3,7 @@ import {
   Button,
   Cascader,
   DatePicker,
+  Divider,
   Form,
   Input,
   InputNumber,
@@ -17,7 +18,7 @@ const formItemLayout = {
       span: 24,
     },
     sm: {
-      span: 6,
+      span: 12,
     },
   },
   wrapperCol: {
@@ -25,23 +26,26 @@ const formItemLayout = {
       span: 24,
     },
     sm: {
-      span: 14,
+      span: 20,
     },
   },
 };
 
 const FormConge = () => {
   return (
+    <>
+    <h3>Informations Personnelles</h3>
+    <Divider />
     <Form
     {...formItemLayout}
     variant="filled"
     style={{
-      maxWidth: 600,
+      maxWidth: 400,
     }}
   >
     <Form.Item
       label="Nom"
-      name="Input"
+      name="nom"
       rules={[
         {
           required: true,
@@ -54,7 +58,7 @@ const FormConge = () => {
 
     <Form.Item
       label="Prenom"
-      name="Input2"
+      name="prenom"
       rules={[
         {
           required: true,
@@ -66,8 +70,8 @@ const FormConge = () => {
     </Form.Item>
 
     <Form.Item
-      label="Reason"
-      name="TextArea"
+      label="Date de naissance"
+      name="DatePicker"
       rules={[
         {
           required: true,
@@ -75,12 +79,30 @@ const FormConge = () => {
         },
       ]}
     >
-      <Input.TextArea />
+      <DatePicker />
+    </Form.Item>
+    <Form.Item
+      label="Sexe"
+      name="Select"
+      
+      rules={[
+        {
+          required: true,
+          message: 'Please input!',
+        },
+      ]}
+    >
+      
+      
+      <Select >
+        <Select.Option value="homme">Homme</Select.Option>
+        <Select.Option value="femme">Femme</Select.Option>
+      </Select>
     </Form.Item>
 
     <Form.Item
-      label="Mentions"
-      name="Mentions"
+      label="Adresse"
+      name="Adresse"
       rules={[
         {
           required: true,
@@ -91,22 +113,11 @@ const FormConge = () => {
       <Mentions />
     </Form.Item>
 
-    <Form.Item
-      label="Select"
-      name="Select"
-      rules={[
-        {
-          required: true,
-          message: 'Please input!',
-        },
-      ]}
-    >
-      <Select />
-    </Form.Item>
+    
 
     <Form.Item
-      label="Cascader"
-      name="Cascader"
+      label="Numéro de telephone"
+      name="numero"
       rules={[
         {
           required: true,
@@ -114,7 +125,19 @@ const FormConge = () => {
         },
       ]}
     >
-      <Cascader />
+      <Input type='String'  />
+    </Form.Item>
+    <Form.Item
+      label="Adresse email"
+      name="email"
+      rules={[
+        {
+          required: true,
+          message: 'Please input!',
+        },
+      ]}
+    >
+      <Input type='email'  />
     </Form.Item>
 
     <Form.Item
@@ -130,18 +153,7 @@ const FormConge = () => {
       <TreeSelect />
     </Form.Item>
 
-    <Form.Item
-      label="DatePicker"
-      name="DatePicker"
-      rules={[
-        {
-          required: true,
-          message: 'Please input!',
-        },
-      ]}
-    >
-      <DatePicker />
-    </Form.Item>
+    
 
     <Form.Item
       label="RangePicker"
@@ -167,6 +179,7 @@ const FormConge = () => {
       </Button>
     </Form.Item>
   </Form>
+  </>
   )
 }
 

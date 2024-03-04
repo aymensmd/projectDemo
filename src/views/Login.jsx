@@ -20,15 +20,14 @@ export default function Login() {
       console.log('Authentication successful', response.data);
 
       localStorage.setItem('token', response.data.token);
-console.log(response.data.token)
+      console.log(response.data.token)
      
       navigate('/users');
 
       message.success('Authentication successful');
     } catch (error) {
       console.error('Authentication failed', error);
-      message.error('Authentication failed. Please check your credentials.');
-    } finally {
+      message.error(error.response?.data?.message || 'Authentication failed. Please check your credentials.');
       setLoading(false);
     }
   };
@@ -97,7 +96,7 @@ console.log(response.data.token)
             span: 16,
           }}
         >
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading}>
              submit
           </Button>
           <div style={{ marginTop: 10 }}>

@@ -8,7 +8,6 @@ const MainContent = () => {
         <div style={{ flex:1 }}>
             <Flex vertical gap='1.3rem'>
                 <Banner />
-                
             </Flex>
         </div>
 

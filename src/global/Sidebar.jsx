@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { WindowsOutlined, ProfileOutlined, FormOutlined, MessageOutlined, SettingOutlined } from '@ant-design/icons';
+import { WindowsOutlined,UsergroupAddOutlined, ProfileOutlined, FormOutlined, MessageOutlined,UserOutlined, SettingOutlined } from '@ant-design/icons';
 import { Flex, Menu } from 'antd';
 
 function getItem(label, key, icon, children, type) {
@@ -14,8 +14,9 @@ function getItem(label, key, icon, children, type) {
 
 const items = [
   getItem('Dashboard', 'dashboard1', <WindowsOutlined />),
-  getItem('Messages', 'HR member', <MessageOutlined />, [
-    getItem('Team', 'g1', null, [getItem('Developers', '1'), getItem('Marketing team', '2')], 'group'),
+  getItem('Chat', 'chat', <MessageOutlined />),
+  getItem('Ressources humains', 'HR member', <UsergroupAddOutlined />, [
+    getItem('Gestion des employés', 'group', null, [getItem('Gestion des profiles', 'users_setting',<UserOutlined />), getItem('Gestion des congés', '2')], 'group'),
    
   ]),
   getItem('Navigation ', 'sub2', <ProfileOutlined />, [

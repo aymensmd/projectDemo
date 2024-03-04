@@ -7,16 +7,21 @@ import Sidebar from './global/Sidebar';
 import './app.css'; // Import your custom styles
 const { Sider, Header, Content } = Layout;
 import Dashbboard from './views/Dashboard'
+import UserSettingView from './views/UserSettingView';
 
 const DashboardContent = () => (
   <div>
     <Dashbboard />
   </div>
 );
+const UserSetting = () => (
+  <div>
+    <UserSettingView />
+  </div>
+);
 
 const MessagesContent = () => (
   <div>
-    
     <Card >
 condidature table here
     </Card>
@@ -36,6 +41,8 @@ const App = () => {
         return <MessagesContent />;
       case 'Messages':
         return <MessagesContent />;
+      case 'users_setting':
+        return <UserSetting />;
       default:
         return null;
     }

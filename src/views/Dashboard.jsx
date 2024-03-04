@@ -9,11 +9,11 @@ import {  Flex } from 'antd';
 import MainContent from '../pages/MainContent';
 import SideContent from '../pages/SideContent';
 
-const { Sider, Header, Content } = Layout;
+const { Content } = Layout;
 
 
 export default function Dashboard() {
-  const [collapsed, setCollapsed] = useState(false);
+  
 
   return (
     <Layout>
