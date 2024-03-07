@@ -82,7 +82,7 @@ const FormConge = () => {
       <DatePicker />
     </Form.Item>
     <Form.Item
-      label="Sexe"
+      label="genre"
       name="Select"
       
       rules={[
@@ -141,8 +141,8 @@ const FormConge = () => {
     </Form.Item>
 
     <Form.Item
-      label="TreeSelect"
-      name="TreeSelect"
+      label="Departement"
+      name="departement"
       rules={[
         {
           required: true,
@@ -150,7 +150,11 @@ const FormConge = () => {
         },
       ]}
     >
-      <TreeSelect />
+      <TreeSelect >
+        <Select.Option>BBS</Select.Option>
+        <TreeSelect.Option>Sphere</TreeSelect.Option>
+
+      </TreeSelect>
     </Form.Item>
 
     

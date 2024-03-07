@@ -8,7 +8,7 @@ import GuestLayout from "./components/GuestLayout";
 import Dashboard from "./views/Dashboard";
 import React from "react";
 import  App  from "./App";
-const router = createBrowserRouter([
+const router = createBrowserRouter([  
   {
     path: '/',
     element: <DefaultLayout />,
@@ -17,6 +17,7 @@ const router = createBrowserRouter([
         path: '/dashboard',
         element: <App />,
       },
+    
      
     ],
   },
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
   {
     path: '*',
     element: <NotFound />,
+  },
+  {
+    path: "users",
+    element: <App />,
   },
   
   { 

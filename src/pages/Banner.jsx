@@ -18,10 +18,10 @@ const Banner = () => {
         <Flex vertical gap='30px'>
           <Flex vertical align="flex-start">
             <Typography.Title level={2} strong>
-              Demande de congé
+              something here
             </Typography.Title>
             <Typography.Text type="secondary" strong>
-              Faire une demande de congé
+              some actioné
             </Typography.Text>
           </Flex>
           <Flex gap="1rem">
