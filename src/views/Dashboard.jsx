@@ -21,7 +21,7 @@ export default function Dashboard() {
         <>
         <Content className="content">
               <Flex gap='large'>
-                {/* Add your authenticated content here */}
+                
                 <MainContent />
                 <SideContent />
               </Flex>

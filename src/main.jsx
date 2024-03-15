@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 import './index.css'
-import { RouterProvider, BrowserRouter, Router, Route } from 'react-router-dom'
+import { RouterProvider } from 'react-router-dom'
 import router from './router'
 import { ContextProvider } from './contexts/ContextProvider.jsx'
 

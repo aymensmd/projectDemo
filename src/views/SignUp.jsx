@@ -14,6 +14,7 @@ export default function SignUp() {
         email: values.email,
         password: values.password,
         password_confirmation: values.password_confirmation,
+        
       });
 
       console.log('Registration successful', response.data);

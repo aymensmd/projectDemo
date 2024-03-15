@@ -1,36 +1,49 @@
 import React, {useState} from 'react';
 import { Button, Card, Checkbox, Form, Input, message } from 'antd';
 import { Link, useNavigate } from 'react-router-dom'; 
-
+import { useStateContext } from '../contexts/ContextProvider';
 import axios from 'axios';
+import { useEffect } from 'react';
 
 export default function Login() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const { token,setToken } = useStateContext();
+  
+  useEffect(() => {
+    console.log('Token:', token);
+  }, [token]); // Log token whenever it changes
 
   const onFinish = async (values) => {
     try {
       setLoading(true);
-
+  
       const response = await axios.post('http://127.0.0.1:8000/api/login', {
         email: values.email,
         password: values.password,
       });
-
+  
       console.log('Authentication successful', response.data);
-
+  
+      // Set token in local storage
       localStorage.setItem('token', response.data.token);
-      console.log(response.data.token)
-     
+  
+      // Update token state using setToken
+      setToken(response.data.token);
+  
       navigate('/users');
-
+  
       message.success('Authentication successful');
     } catch (error) {
       console.error('Authentication failed', error);
-      message.error(error.response?.data?.message || 'Authentication failed. Please check your credentials.');
+      message.error(
+        error.response?.data?.message ||
+          'Authentication failed. Please check your credentials.'
+      );
       setLoading(false);
     }
   };
+  
   return (
     <Card>
       <h2 style={{ color: "#1677ff" }}>Sign Up!</h2>
