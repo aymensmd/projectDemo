@@ -5,7 +5,9 @@ import {
   DatePicker,
   Divider,
   Form,
+  Card,
   Input,
+  Space,
   InputNumber,
   Mentions,
   Select,
@@ -18,7 +20,7 @@ const formItemLayout = {
       span: 24,
     },
     sm: {
-      span: 12,
+      span: 10,
     },
   },
   wrapperCol: {
@@ -31,11 +33,13 @@ const formItemLayout = {
   },
 };
 
-const FormConge = () => {
+const AddUser = () => {
+  
   return (
     <>
     <h3>Informations Personnelles</h3>
     <Divider />
+    <Card>
     <Form
     {...formItemLayout}
     variant="filled"
@@ -53,7 +57,7 @@ const FormConge = () => {
         },
       ]}
     >
-      <Input />
+      <Input  />
     </Form.Item>
 
     <Form.Item
@@ -66,9 +70,20 @@ const FormConge = () => {
         },
       ]}
     >
-      <Input />
+      <Input  />
     </Form.Item>
-
+    <Form.Item
+      label="Adresse email"
+      name="email"
+      rules={[
+        {
+          required: true,
+          message: 'Please input!',
+        },
+      ]}
+    >
+      <Input type='email'   />
+    </Form.Item>
     <Form.Item
       label="Date de naissance"
       name="DatePicker"
@@ -82,7 +97,7 @@ const FormConge = () => {
       <DatePicker />
     </Form.Item>
     <Form.Item
-      label="Sexe"
+      label="Genre"
       name="Select"
       
       rules={[
@@ -94,9 +109,9 @@ const FormConge = () => {
     >
       
       
-      <Select >
-        <Select.Option value="homme">Homme</Select.Option>
-        <Select.Option value="femme">Femme</Select.Option>
+      <Select  >
+        <Select.Option   >Homme</Select.Option>
+        <Select.Option   >Femme</Select.Option>
       </Select>
     </Form.Item>
 
@@ -110,7 +125,7 @@ const FormConge = () => {
         },
       ]}
     >
-      <Mentions />
+      <Mentions  />
     </Form.Item>
 
     
@@ -125,24 +140,13 @@ const FormConge = () => {
         },
       ]}
     >
-      <Input type='String'  />
+      <Input type='String'   />
     </Form.Item>
-    <Form.Item
-      label="Adresse email"
-      name="email"
-      rules={[
-        {
-          required: true,
-          message: 'Please input!',
-        },
-      ]}
-    >
-      <Input type='email'  />
-    </Form.Item>
+    
 
     <Form.Item
-      label="TreeSelect"
-      name="TreeSelect"
+      label="numéro d'urgence "
+      name="number"
       rules={[
         {
           required: true,
@@ -150,14 +154,27 @@ const FormConge = () => {
         },
       ]}
     >
-      <TreeSelect />
+       <Space.Compact >
+      <Input
+        style={{
+          width: '20%',
+        }}
+        defaultValue="0571"
+      />
+      <Input
+        style={{
+          width: '80%',
+        }}
+        defaultValue="21950137"
+      />
+    </Space.Compact>
     </Form.Item>
 
     
 
     <Form.Item
-      label="RangePicker"
-      name="RangePicker"
+      label="Situation familiale"
+      name="Situation"
       rules={[
         {
           required: true,
@@ -165,7 +182,11 @@ const FormConge = () => {
         },
       ]}
     >
-      <RangePicker />
+      <Select   >
+        <Select.Option value="Celebataire">Celebataire</Select.Option>
+        <Select.Option value="Marier">Marier</Select.Option>
+        <Select.Option value="Autres">Autres</Select.Option>
+      </Select>
     </Form.Item>
 
     <Form.Item
@@ -175,12 +196,13 @@ const FormConge = () => {
       }}
     >
       <Button type="primary" htmlType="submit">
-        Submit
+        Suivant
       </Button>
     </Form.Item>
   </Form>
+    </Card>
   </>
   )
 }
 
-export default FormConge
+export default AddUser

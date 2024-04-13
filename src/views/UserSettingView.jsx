@@ -1,11 +1,14 @@
-import React, { useState } from 'react'
-import Layout from 'antd/es/layout/layout';
-import {PlusOutlined} from '@ant-design/icons'
+import React, { useState } from 'react';
+import { Layout, Breadcrumb, Menu, theme } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { Button, Card, Drawer, Flex, Typography } from 'antd';
-import Form from "../Form/index"
-const {Content} = Layout
+import Form from '../Form/index';
+import UserTable from './UserTable';
+
+const { Header, Content } = Layout;
+
 export default function UserSettingView() {
-  const [someBooleanValue, setDrawerVisible] = useState(false);
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
   const showDrawer = () => {
     setDrawerVisible(true);
@@ -14,46 +17,82 @@ export default function UserSettingView() {
   const closeDrawer = () => {
     setDrawerVisible(false);
   };
-  return (
-    <>
-      <Content className="content">
-              <Flex gap='large'>
-              <Card style={{ height: 250, padding: '20px', width: 500 }}>
-        <Flex vertical gap='20px'>
-          <Flex vertical align="flex-start">
-            <Typography.Title level={3} strong>
-              Gestion des comptes
-            </Typography.Title>
-            <Typography.Text type="secondary" strong>
-              creation & modifiction des compt
-            </Typography.Text>
-          </Flex>
-          <Flex gap="1rem">
-            <Button type='primary' size='large' onClick={showDrawer} >
-            <PlusOutlined />
-              Ajouter
-            </Button>
-            
-            <Button size='large'>Modifier</Button>
-            <Button danger size='large'>Supprimer</Button>
-          </Flex>
-        </Flex>
-      </Card>
-      <Card   style={{ height: 250, padding: '20px', width: 500 }}>other content</Card>
-              </Flex>
 
-              <Drawer
-        title="Faire une demande de congé"
-        placement="right"
-        onClose={closeDrawer}
-        open={someBooleanValue}
-        size='large'
-       
-      >
-        {/* Content of the drawer */}
-        <Form />
-      </Drawer>
-            </Content>
-    </>
-  )
+  const {
+    token: {  borderRadiusLG },
+  } = theme.useToken();
+
+  
+  const items = [
+    { key: '1', label: 'gestion des employés' },
+    { key: '2', label: 'gestion des absences' },
+    { key: '3', label: 'gestion de congés ' },
+    { key: '4', label: 'Contact' },
+  ];
+
+  return (
+    <Layout>
+      <Header style={{ display: 'flex', alignItems: 'center' }}>
+        <div className="demo-logo" />
+        <Menu
+          theme="dark"
+          mode="horizontal"
+          defaultSelectedKeys={['1']}
+          style={{ flex: 1, minWidth: 0 }}
+        >
+          {items.map(item => (
+            <Menu.Item key={item.key}>{item.label}</Menu.Item>
+          ))}
+        </Menu>
+      </Header>
+      <Content style={{ padding: '0 48px' }}>
+      
+        <div
+          style={{
+           
+            minHeight: 280,
+            padding: 24,
+            borderRadius: borderRadiusLG,
+          }}
+        >
+          <Flex gap="large">
+            <Card style={{ padding: '20px', maxHeight: '200px' }}>
+              <Flex vertical gap="20px">
+                <Flex vertical align="flex-start">
+                  <Typography.Title level={3} strong>
+                    Gestion des comptes
+                  </Typography.Title>
+                  <Typography.Text type="secondary" strong>
+                    creation & modification des comptes
+                  </Typography.Text>
+                </Flex>
+                <Flex gap="1rem">
+                  <Button type="primary" size="large" onClick={showDrawer}>
+                    <PlusOutlined />
+                    Ajouter
+                  </Button>
+                </Flex>
+              </Flex>
+            </Card>
+
+            <Flex>
+              <UserTable />
+            </Flex>
+          </Flex>
+
+          <Drawer
+            title="Faire une demande de congé"
+            placement="right"
+            onClose={closeDrawer}
+            visible={drawerVisible}
+            size="large"
+          >
+            {/* Content of the drawer */}
+            <Form />
+          </Drawer>
+        </div>
+      </Content>
+  
+    </Layout>
+  );
 }

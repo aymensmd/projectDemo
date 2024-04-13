@@ -5,44 +5,31 @@ import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import CustomHeader from './global/CustomHeader';
 import Sidebar from './global/Sidebar';
 import './app.css'; // Import your custom styles
+import { Navigate } from 'react-router-dom';
 const { Sider, Header, Content } = Layout;
-import Dashbboard from './views/Dashboard'
+import Dashboard from './views/Dashboard'
 import UserSettingView from './views/UserSettingView';
 
-const DashboardContent = () => (
-  <div>
-    <Dashbboard />
-  </div>
-);
-const UserSetting = () => (
-  <div>
-    <UserSettingView />
-  </div>
-);
 
-const MessagesContent = () => (
-  <div>
-    <Card >
-condidature table here
-    </Card>
-  </div>
-);
+
+
+
 
 const App = () => {
   const [collapsed, setCollapsed] = useState(true);
-  const [selectedMenuItem, setSelectedMenuItem] = useState('dashboard1');
+  const [selectedMenuItem, setSelectedMenuItem] = useState('users_setting');
 
   const renderContent = () => {
     switch (selectedMenuItem) {
-      case 'dashboard1':
-        return <DashboardContent />;
+      case 'dashboard':
+        return <Dashboard/>;
       // Add more cases for other menu items
       case 'Condidature':
-        return <MessagesContent />;
+        return <UserSettingView />;
       case 'Messages':
-        return <MessagesContent />;
+        return 'todo';
       case 'users_setting':
-        return <UserSetting />;
+        return <UserSettingView />;
       default:
         return null;
     }

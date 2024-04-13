@@ -13,10 +13,10 @@ function getItem(label, key, icon, children, type) {
 }
 
 const items = [
-  getItem('Dashboard', 'dashboard1', <WindowsOutlined />),
+  getItem('Dashboard', 'dashboard', <WindowsOutlined />),
   getItem('Chat', 'chat', <MessageOutlined />),
   getItem('Ressources humains', 'HR member', <UsergroupAddOutlined />, [
-    getItem('Gestion des employés', 'group', null, [getItem('Gestion des profiles', 'users_setting',<UserOutlined />), getItem('Gestion des congés', '2')], 'group'),
+  getItem('Gestion des employés', 'group', null, [getItem('Gestion des profiles', 'users_setting',<UserOutlined />), getItem('Gestion des congés', '2')], 'group'),
    
   ]),
   getItem('Navigation ', 'sub2', <ProfileOutlined />, [

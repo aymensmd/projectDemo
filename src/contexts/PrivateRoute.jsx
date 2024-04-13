@@ -5,7 +5,7 @@ const PrivateRouteContext = createContext();
 
 export const PrivateRouteProvider = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const [selectedMenuItem, setSelectedMenuItem] = useState('dashboard1');
+  const [selectedMenuItem, setSelectedMenuItem] = useState('dashboard');
 
   return (
     <PrivateRouteContext.Provider

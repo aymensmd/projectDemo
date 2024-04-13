@@ -1,4 +1,4 @@
-import { Navigate, createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import Login from "./views/Login";
 import SignUp from "./views/SignUp";
 import NotFound from "./views/NotFound";
@@ -7,6 +7,8 @@ import GuestLayout from "./components/GuestLayout";
 import Dashboard from "./views/Dashboard";
 import React from "react";
 import  App  from "./App";
+
+  
 const router = createBrowserRouter([
   {
     path: '/',
@@ -15,7 +17,7 @@ const router = createBrowserRouter([
     
     
       { 
-        path: 'dashboard1',
+        path: 'dashboard',
         element: <Dashboard />,
       },
     ],
@@ -40,7 +42,7 @@ const router = createBrowserRouter([
     element: <NotFound />,
   },
   {
-    path: "users",
+    path: "app",
     element: <App />,
   },
 
