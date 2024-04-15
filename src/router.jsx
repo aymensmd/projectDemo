@@ -4,7 +4,7 @@ import SignUp from "./views/SignUp";
 import NotFound from "./views/NotFound";
 import DefaultLayout from "./components/DefaultLayout";
 import GuestLayout from "./components/GuestLayout";
-import Dashboard from "./views/Dashboard";
+
 import React from "react";
 import  App  from "./App";
 
@@ -15,15 +15,14 @@ const router = createBrowserRouter([
     element: <DefaultLayout />,
     children: [
     
-    
       { 
-        path: 'dashboard',
-        element: <Dashboard />,
+        path: 'app',
+        element: <App />,
       },
     ],
   },
   {
-    path: '/',
+    index: '/',
     element: <GuestLayout />,
     children: [
       {
@@ -41,10 +40,8 @@ const router = createBrowserRouter([
     path: '*',
     element: <NotFound />,
   },
-  {
-    path: "app",
-    element: <App />,
-  },
+ 
+  
 
 ]);
 

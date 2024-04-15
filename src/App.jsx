@@ -5,10 +5,11 @@ import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import CustomHeader from './global/CustomHeader';
 import Sidebar from './global/Sidebar';
 import './app.css'; // Import your custom styles
-import { Navigate } from 'react-router-dom';
+
 const { Sider, Header, Content } = Layout;
 import Dashboard from './views/Dashboard'
 import UserSettingView from './views/UserSettingView';
+import { Outlet } from 'react-router-dom';
 
 
 
@@ -19,8 +20,10 @@ const App = () => {
   const [collapsed, setCollapsed] = useState(true);
   const [selectedMenuItem, setSelectedMenuItem] = useState('users_setting');
 
+
+
   const renderContent = () => {
-    switch (selectedMenuItem) {
+  switch (selectedMenuItem) {
       case 'dashboard':
         return <Dashboard/>;
       // Add more cases for other menu items
@@ -32,7 +35,8 @@ const App = () => {
         return <UserSettingView />;
       default:
         return null;
-    }
+    } 
+    
   };
 
   return (
@@ -58,7 +62,8 @@ const App = () => {
             <CustomHeader />
           </Header>
           <Content className="content">
-            {renderContent()}
+            <Outlet />
+            {selectedMenuItem}
           </Content>
         </Layout>
       </>

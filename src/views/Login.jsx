@@ -26,12 +26,12 @@ export default function Login() {
       console.log('Authentication successful', response.data);
   
       // Set token in local storage
-      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('ACCESS_TOKEN', response.data.token);
   
       // Update token state using setToken
-      setToken(response.data.token);
-  
-      navigate('/users');
+      setToken(response.data);
+      console.log('Token after login:', response.data.token);
+      navigate('/app');
   
       message.success('Authentication successful');
     } catch (error) {
