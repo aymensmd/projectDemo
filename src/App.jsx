@@ -9,7 +9,7 @@ import './app.css'; // Import your custom styles
 const { Sider, Header, Content } = Layout;
 import Dashboard from './views/Dashboard'
 import UserSettingView from './views/UserSettingView';
-import { Outlet } from 'react-router-dom';
+
 
 
 
@@ -62,8 +62,8 @@ const App = () => {
             <CustomHeader />
           </Header>
           <Content className="content">
-            <Outlet />
-            {selectedMenuItem}
+            
+            {renderContent()}
           </Content>
         </Layout>
       </>

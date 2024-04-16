@@ -19,6 +19,8 @@ const router = createBrowserRouter([
         path: 'app',
         element: <App />,
       },
+      
+
     ],
   },
   {
@@ -40,6 +42,13 @@ const router = createBrowserRouter([
     path: '*',
     element: <NotFound />,
   },
+
+  // to delete
+  {
+    path: '/dash',
+    element: <App />,
+  },
+  
  
   
 

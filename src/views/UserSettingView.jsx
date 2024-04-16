@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Layout, Breadcrumb, Menu, theme } from 'antd';
+import { Layout, Menu, theme } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Card, Drawer, Flex, Typography } from 'antd';
 import Form from '../Form/index';
 import UserTable from './UserTable';
+import { Link } from 'react-router-dom';
 
 const { Header, Content } = Layout;
 
@@ -24,7 +25,7 @@ export default function UserSettingView() {
 
   
   const items = [
-    { key: '1', label: 'gestion des employés' },
+    { key: '1', label: 'gestion des employés',path: '/Dashboard' },
     { key: '2', label: 'gestion des absences' },
     { key: '3', label: 'gestion de congés ' },
     { key: '4', label: 'Contact' },
@@ -42,7 +43,7 @@ export default function UserSettingView() {
           style={{ flex: 1, minWidth: 0 }}
         >
           {items.map(item => (
-            <Menu.Item key={item.key}>{item.label}</Menu.Item>
+            <Menu.Item key={item.key}><Link to={item.path} ></Link> {item.label}</Menu.Item>
           ))}
         </Menu>
       </Header>
