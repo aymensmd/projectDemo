@@ -7,6 +7,8 @@ import GuestLayout from "./components/GuestLayout";
 
 import React from "react";
 import  App  from "./App";
+import EmployeViewComponent from "./views/EmployeViewComponent";
+import Dashboard from "./views/Dashboard";
 
   
 const router = createBrowserRouter([
@@ -47,6 +49,13 @@ const router = createBrowserRouter([
   {
     path: '/dash',
     element: <App />,
+    children: [ 
+      {
+        path:'/dash/chat',
+        element: <EmployeViewComponent />
+
+      }
+    ]
   },
   
  

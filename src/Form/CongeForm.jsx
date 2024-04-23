@@ -21,27 +21,23 @@ const formItemLayout = {
 const AddUser = () => {
   const onFinish = async (values) => {
     try {
-      // Set role_id based on the selected role
-      if (values.role === 'Admin') {
-        values.role_id = "1";
-      } else if (values.role === 'Moderator') {
-        values.role_id = "2";
-      }
-    
+      // Convert date_naissance to ISO string
+      values.date_naissance = values.date_naissance.toISOString().split('T')[0];
+  
       // Send the form data to the API endpoint
       const response = await axios.post('http://127.0.0.1:8000/api/store', values);
-    
+  
       console.log('Registration successful', response.data);
-    
+  
       // Handle the registration success logic here
       message.success('Registration successful');
-    
+  
       // Redirect to the login page after successful registration
-    
+  
     } catch (error) {
       console.error('Registration failed', error);
       message.error('Registration failed');
-    
+  
       // Display the error message received from the server
       if (error.response && error.response.data && error.response.data.message) {
         message.error(`Registration failed: ${error.response.data.message}`);
@@ -50,7 +46,6 @@ const AddUser = () => {
       }
     }
   };
-  
 
   return (
     <>
@@ -68,13 +63,21 @@ const AddUser = () => {
           <Col xs={24} sm={12}>
             <Form.Item
               label="Nom"
-              name="name"
+              name="nom"
               rules={[{ required: true, message: 'Please input!' }]}
             >
               <Input />
             </Form.Item>
           </Col>
-          
+          <Col xs={24} sm={12}>
+            <Form.Item
+              label="Prénom"
+              name="prenom"
+              rules={[{ required: true, message: 'Please input!' }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
           <Col xs={24} sm={12}>
             <Form.Item
               label="Adresse email"
@@ -87,7 +90,7 @@ const AddUser = () => {
           <Col xs={24} sm={12}>
             <Form.Item
               label="Date de naissance"
-              name="dateOfBirth"
+              name="date_naissance"
               rules={[{ required: true, message: 'Please input!' }]}
             >
               <DatePicker style={{ width: '100%' }} />
@@ -103,11 +106,22 @@ const AddUser = () => {
   </Form.Item>
 </Col>
 
-          
+          <Col xs={24} sm={12}>
+            <Form.Item
+              label="Genre"
+              name="genre"
+              rules={[{ required: false, message: 'Please input!' }]}
+            >
+              <Select style={{ width: '100%' }}>
+                <Option value="Homme">Homme</Option>
+                <Option value="Femme">Femme</Option>
+              </Select>
+            </Form.Item>
+          </Col>
           <Col xs={24} sm={12}>
             <Form.Item
               label="Adresse"
-              name="adress"
+              name="adresse"
               rules={[{ required: true, message: 'Please input!' }]}
             >
               <Mentions style={{ width: '100%' }} />
@@ -116,7 +130,7 @@ const AddUser = () => {
           <Col xs={24} sm={12}>
             <Form.Item
               label="Numéro de téléphone"
-              name="phone_number"
+              name="numero_telephone"
               rules={[{ required: true, message: 'Please input!' }]}
             >
               <Input style={{ width: '100%' }} />
@@ -125,7 +139,7 @@ const AddUser = () => {
           <Col xs={24} sm={12}>
             <Form.Item
               label="Numéro d'urgence"
-              name="sos_number"
+              name="numero_urgence"
               rules={[{ required: true, message: 'Please input!' }]}
             >
               <Space>
@@ -136,25 +150,13 @@ const AddUser = () => {
           <Col xs={24} sm={12}>
             <Form.Item
               label="Situation familiale"
-              name="social_situation"
+              name="situation_familiale"
               rules={[{ required: true, message: 'Please input!' }]}
             >
               <Select style={{ width: '100%' }}>
                 <Option value="Célibataire">Célibataire</Option>
                 <Option value="Marié">Marié</Option>
                 <Option value="Autres">Autres</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={12}>
-            <Form.Item
-              label="Rôle"
-              name="role"
-              rules={[{ required: true, message: 'Please select a role!' }]}
-            >
-              <Select style={{ width: '100%' }}>
-                <Option value="Admin">Admin</Option>
-                <Option value="Moderator">Moderator</Option>
               </Select>
             </Form.Item>
           </Col>

@@ -5,7 +5,7 @@ import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import CustomHeader from './global/CustomHeader';
 import Sidebar from './global/Sidebar';
 import './app.css'; // Import your custom styles
-
+import MessageComponent from './views/MessageComponent'
 const { Sider, Header, Content } = Layout;
 import Dashboard from './views/Dashboard'
 import UserSettingView from './views/UserSettingView';
@@ -28,9 +28,9 @@ const App = () => {
         return <Dashboard/>;
       // Add more cases for other menu items
       case 'Condidature':
-        return <UserSettingView />;
-      case 'Messages':
-        return 'todo';
+        return <UserSettingView onSelectMenuItem={setSelectedMenuItem} />;
+      case 'chat':
+        return <MessageComponent />;
       case 'users_setting':
         return <UserSettingView />;
       default:

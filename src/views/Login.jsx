@@ -15,34 +15,37 @@ export default function Login() {
   }, [token]); // Log token whenever it changes
 
   const onFinish = async (values) => {
-    try {
-      setLoading(true);
-  
-      const response = await axios.post('http://127.0.0.1:8000/api/login', {
-        email: values.email,
-        password: values.password,
-      });
-  
-      console.log('Authentication successful', response.data);
-  
-      // Set token in local storage
-      localStorage.setItem('ACCESS_TOKEN', response.data.token);
-  
-      // Update token state using setToken
-      setToken(response.data);
-      console.log('Token after login:', response.data.token);
-      navigate('/app');
-  
-      message.success('Authentication successful');
-    } catch (error) {
-      console.error('Authentication failed', error);
-      message.error(
-        error.response?.data?.message ||
-          'Authentication failed. Please check your credentials.'
-      );
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+
+    const response = await axios.post('http://127.0.0.1:8000/api/login', {
+      email: values.email,
+      password: values.password,
+    });
+
+    console.log('Authentication successful', response.data);
+
+    // Set token in local storage
+    localStorage.setItem('ACCESS_TOKEN', response.data.token);
+
+    // Update token state using setToken
+    setToken(response.data);
+
+    // Navigate to the desired page
+    navigate('/app');
+
+    message.success('Authentication successful');
+  } catch (error) {
+    console.error('Authentication failed', error);
+    message.error(
+      error.response?.data?.message ||
+        'Authentication failed. Please check your credentials.'
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
   
   return (
     <Card>

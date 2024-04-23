@@ -1,6 +1,6 @@
 import { Button, Card, Drawer, Flex, Typography } from 'antd';
 import React, { useState } from 'react';
-
+import CongeForm from '../Form/CongeForm'
 const Banner = () => {
   const [someBooleanValue, setDrawerVisible] = useState(false);
 
@@ -41,7 +41,7 @@ const Banner = () => {
         open={someBooleanValue}
        
       >
-        {/* Content of the drawer */}
+        <CongeForm />
         
       </Drawer>
       <Card style={{ height: 325, padding: '20px' }}>

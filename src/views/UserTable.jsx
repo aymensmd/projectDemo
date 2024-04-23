@@ -1,204 +1,98 @@
-import React from 'react'
-import { Space, Table, Tag } from 'antd';
-const UsersView = () => {
-    const columns = [
-        {
-          title: 'firstname',
-          dataIndex: 'firstname',
-          key: 'firstname',
-          render: (text) => <a>{text}</a>,
-        },
-        {
-          title: 'lastname',
-          dataIndex: 'lastname',
-          key: 'lastname',
-          render: (text) => <a>{text}</a>,
-        },
-        {
-          title: 'Age',
-          dataIndex: 'age',
-          key: 'age',
-        },
-        {
-          title: 'Address',
-          dataIndex: 'address',
-          key: 'address',
-        },
-        {
-          title: 'Tags',
-          key: 'tags',
-          dataIndex: 'tags',
-          render: (_, { tags }) => (
-            <>
-              {tags.map((tag) => {
-                let color = tag.length > 5 ? 'geekblue' : 'green';
-                if (tag === 'loser') {
-                  color = 'volcano';
-                }
-                return (
-                  <Tag color={color} key={tag}>
-                    {tag.toUpperCase()}
-                  </Tag>
-                );
-              })}
-            </>
-          ),
-        },
-        {
-          title: 'Action',
-          key: 'action',
-          render: (_, record) => (
-            <Space size="middle">
-              <a>Update {record.name}</a>
-              <a>Delete</a>
-            </Space>
-          ),
-        },
-      ];
-      const data = [
-        {
-          key: '1',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '2',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '3',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '4',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '5',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '6',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '7',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '8',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '9',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '10',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '11',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '12',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '13',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '14',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '15',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '16',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-        {
-          key: '17',
-          firstname: 'John Brown',
-          lastname: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: ['nice', 'developer'],
-        },
-       
-      ];
-  return (
-    <>
-       <Table columns={columns} dataSource={data}  />
-    </>
-  )
-}
+import React, { useState, useEffect } from 'react';
+import { Table, Input, Button } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
-export default UsersView
+const UsersView = () => {
+  const [employees, setEmployees] = useState([]);
+  const [searchText, setSearchText] = useState('');
+
+  useEffect(() => {
+    // Fetch employees data from the API
+    axios.get('http://127.0.0.1:8000/api/employees')
+      .then(response => {
+        setEmployees(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching employees:', error);
+      });
+  }, []);
+
+  const handleSearch = value => {
+    setSearchText(value);
+  };
+
+  const handleReset = () => {
+    setSearchText('');
+  };
+
+  const filteredEmployees = searchText
+  ? employees.filter(employee =>
+      Object.values(employee).some(value =>
+        value && value.toString().toLowerCase().includes(searchText.toLowerCase())
+      )
+    )
+  : employees;
+
+  const columns = [
+    {
+      title: 'First Name',
+      dataIndex: 'name',
+      key: 'nom',
+    },
+   
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+    },
+ 
+    {
+      title: 'Adresse',
+      dataIndex: 'adress',
+      key: 'adresse',
+    },
+    {
+      title: 'Numéro de téléphone',
+      dataIndex: 'phone_number',
+      key: 'numero_telephone',
+    },
+    {
+      title: 'Numéro d\'urgence',
+      dataIndex: 'sos_number',
+      key: 'numero_urgence',
+    },
+    {
+      title: 'Situation Familiale',
+      dataIndex: 'social_situation',
+      key: 'situation_familiale',
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (text) => (
+        <span>
+          <a>Update </a>
+          <a>Delete</a>
+        </span>
+      ),
+    },
+  ];
+
+  return (
+    <div>
+      <Input
+        placeholder="Search"
+        value={searchText}
+        onChange={e => handleSearch(e.target.value)}
+        style={{ marginBottom: 16, width: 200 }}
+        prefix={<SearchOutlined />}
+        allowClear
+      />
+      <Button onClick={handleReset}>Reset</Button>
+      <Table columns={columns} dataSource={filteredEmployees} />
+    </div>
+  );
+};
+
+export default UsersView;

@@ -1,100 +1,59 @@
 import React, { useState } from 'react';
-import { Layout, Menu, theme } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, Card, Drawer, Flex, Typography } from 'antd';
-import Form from '../Form/index';
+import { Layout, Menu } from 'antd';
+import EmployeViewComponent from './EmployeViewComponent';
 import UserTable from './UserTable';
-import { Link } from 'react-router-dom';
 
-const { Header, Content } = Layout;
+import { Outlet } from 'react-router-dom';
 
-export default function UserSettingView() {
-  const [drawerVisible, setDrawerVisible] = useState(false);
+const { Header } = Layout;
 
-  const showDrawer = () => {
-    setDrawerVisible(true);
+function UserSettingView({ onSelectMenuItem }) {
+  const [current, setCurrent] = useState('1');
+
+  const handleMenuClick = (e) => {
+    console.log('click ', e);
+    setCurrent(e.key);
   };
 
-  const closeDrawer = () => {
-    setDrawerVisible(false);
+  const renderContent = (key) => {
+    switch (key) {
+      case '1':
+        return <EmployeViewComponent />;
+      case '2':
+        return "todo";
+      case '3':
+        return <EmployeViewComponent />;
+      case '4':
+        return <EmployeViewComponent />;
+      default:
+        return null;
+    }
   };
-
-  const {
-    token: {  borderRadiusLG },
-  } = theme.useToken();
-
-  
-  const items = [
-    { key: '1', label: 'gestion des employés',path: '/Dashboard' },
-    { key: '2', label: 'gestion des absences' },
-    { key: '3', label: 'gestion de congés ' },
-    { key: '4', label: 'Contact' },
-  ];
-  
 
   return (
     <Layout>
       <Header style={{ display: 'flex', alignItems: 'center' }}>
         <div className="demo-logo" />
         <Menu
+          onClick={handleMenuClick}
           theme="dark"
           mode="horizontal"
           defaultSelectedKeys={['1']}
+          selectedKeys={[current]}
           style={{ flex: 1, minWidth: 0 }}
         >
-          {items.map(item => (
-            <Menu.Item key={item.key}><Link to={item.path} ></Link> {item.label}</Menu.Item>
-          ))}
+          <Menu.Item key="1" >
+            Gestion des comptes
+          </Menu.Item>
+          <Menu.Item key="2">Gestion des absences</Menu.Item>
+          <Menu.Item key="3">Gestion de congés</Menu.Item>
+          <Menu.Item key="4">Contact</Menu.Item>
         </Menu>
       </Header>
-      <Content style={{ padding: '0 48px' }}>
-      
-        <div
-          style={{
-           
-            minHeight: 280,
-            padding: 24,
-            borderRadius: borderRadiusLG,
-          }}
-        >
-          <Flex gap="large">
-            <Card style={{ padding: '20px', maxHeight: '200px' }}>
-              <Flex vertical gap="20px">
-                <Flex vertical align="flex-start">
-                  <Typography.Title level={3} strong>
-                    Gestion des comptes
-                  </Typography.Title>
-                  <Typography.Text type="secondary" strong>
-                    creation & modification des comptes
-                  </Typography.Text>
-                </Flex>
-                <Flex gap="1rem">
-                  <Button type="primary" size="large" onClick={showDrawer}>
-                    <PlusOutlined />
-                    Ajouter
-                  </Button>
-                </Flex>
-              </Flex>
-            </Card>
-
-            <Flex>
-              <UserTable />
-            </Flex>
-          </Flex>
-
-          <Drawer
-            title="Faire une demande de congé"
-            placement="right"
-            onClose={closeDrawer}
-            visible={drawerVisible}
-            size="large"
-          >
-            {/* Content of the drawer */}
-            <Form />
-          </Drawer>
-        </div>
-      </Content>
-  
+      <Outlet />
+      {renderContent(current)}
     </Layout>
   );
 }
+
+export default UserSettingView;
