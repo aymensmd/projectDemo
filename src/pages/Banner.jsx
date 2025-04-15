@@ -70,6 +70,7 @@ const Banner = ({ userId }) => {
 
   return (
     <>
+<<<<<<< HEAD
       <Card style={{ padding: '20px', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}> {/* Removed duplicate text */}
           <div style={{ flex: '1 1 auto', minWidth: '250px', textAlign: 'left' }}> {/* Aligned text to the left */}
@@ -78,6 +79,16 @@ const Banner = ({ userId }) => {
             </Typography.Title>
             <Typography.Text type="secondary" style={{ fontSize: '16px' }}>
               Faire une demande de congé
+=======
+      <Card style={{ height: 260, padding: '20px' }}>
+        <Flex vertical gap='30px'>
+          <Flex vertical align="flex-start">
+            <Typography.Title level={2} strong>
+              something here
+            </Typography.Title>
+            <Typography.Text type="secondary" strong>
+              some actioné
+>>>>>>> 66757f1ec900002ab150887e622332506504d1ea
             </Typography.Text>
             <div style={{ display: 'flex', gap: '1rem', marginTop: '20px' }}> {/* Adjusted button alignment */}
               <Button type="primary" size="large" style={{ borderRadius: '5px' }} onClick={showDrawer}>
