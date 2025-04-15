@@ -1,66 +1,66 @@
-import { createBrowserRouter } from "react-router-dom";
-import Login from "./views/Login";
-import SignUp from "./views/SignUp";
-import NotFound from "./views/NotFound";
-import DefaultLayout from "./components/DefaultLayout";
-import GuestLayout from "./components/GuestLayout";
+import { createBrowserRouter } from 'react-router-dom';
+import Login from './views/Login';
 
-import React from "react";
-import  App  from "./App";
-import EmployeViewComponent from "./views/EmployeViewComponent";
-import Dashboard from "./views/Dashboard";
+import NotFound from './views/NotFound';
+import DefaultLayout from './components/DefaultLayout';
 
-  
+import React from 'react';
+import App from './App';
+import EmployeViewComponent from './views/EmployeViewComponent';
+import Dashboard from './views/Dashboard';
+import UserSettingView from './views/UserSettingView';
+import Unauthorized from './views/Unauthorized';
+import PrivateRoute from './contexts/PrivateRoute';
+import ProfilePage from './views/ProfilePage';
+
 const router = createBrowserRouter([
   {
-    path: '/',
+    index: '/',
     element: <DefaultLayout />,
     children: [
-    
-      { 
+      {
         path: 'app',
         element: <App />,
+        hasChild: true,
+        allowedRoles: ['admin', 'user'], // Example of allowed roles
       },
-      
-
+      {
+        path: 'users_setting',
+        element: <UserSettingView />,
+      },
+      {
+        path: 'profile',
+        element: <ProfilePage />, // Add the ProfilePage component as the route element
+      },
     ],
   },
+
   {
-    index: '/',
-    element: <GuestLayout />,
-    children: [
-      {
-        path: 'login',
-        element: <Login />,
-      },
-      {
-        path: 'signup',
-        element: <SignUp />,
-      },
-    ],
-  },
-
+    path: 'login',
+    element: <Login />,
+  },  
+  
   {
     path: '*',
     element: <NotFound />,
   },
-
-  // to delete
+  {
+    path: 'unauthorized',
+    element: <Unauthorized />,
+  },
   {
     path: '/dash',
     element: <App />,
-    children: [ 
+    children: [
       {
-        path:'/dash/chat',
-        element: <EmployeViewComponent />
-
-      }
-    ]
+        path: '/dash/chat',
+        element: <EmployeViewComponent />,
+      },
+    ],
   },
   
- 
   
-
 ]);
+
 
 export default router;

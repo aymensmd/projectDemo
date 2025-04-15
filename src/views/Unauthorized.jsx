@@ -1,13 +1,12 @@
-// Unauthorized.js
 import React from 'react';
-
-const Unauthorized = () => {
-  return (
-    <div>
-      <h2>Unauthorized Access</h2>
-      <p>You do not have permission to access this page.</p>
-    </div>
-  );
-};
-
-export default Unauthorized;
+import { Button, Result } from 'antd';
+import {Link} from 'react-router-dom'
+const App = () => (
+  <Result
+    status="403"
+    title="403"
+    subTitle="Sorry, you are not authorized to access this page."
+    extra={<Link to="/app" ><Button type="primary">Back Home</Button></Link>}
+  />
+);
+export default App; 

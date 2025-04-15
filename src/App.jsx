@@ -9,10 +9,7 @@ import MessageComponent from './views/MessageComponent'
 const { Sider, Header, Content } = Layout;
 import Dashboard from './views/Dashboard'
 import UserSettingView from './views/UserSettingView';
-
-
-
-
+import { Outlet, Navigate } from 'react-router-dom';
 
 
 
@@ -22,50 +19,12 @@ const App = () => {
 
 
 
-  const renderContent = () => {
-  switch (selectedMenuItem) {
-      case 'dashboard':
-        return <Dashboard/>;
-      // Add more cases for other menu items
-      case 'Condidature':
-        return <UserSettingView onSelectMenuItem={setSelectedMenuItem} />;
-      case 'chat':
-        return <MessageComponent />;
-      case 'users_setting':
-        return <UserSettingView />;
-      default:
-        return null;
-    } 
-    
-  };
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <>
-        <Sider
-          theme="light"
-          trigger={null}
-          collapsible
-          collapsed={collapsed}
-          className="sider"
-        >
-          <Sidebar onSelectMenuItem={setSelectedMenuItem} />
-          <Button
-            type='text'
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            className="triger-btn"
-          />
-        </Sider>
-        <Layout>
-          <Header className="header">
-            <CustomHeader />
-          </Header>
-          <Content className="content">
-            
-            {renderContent()}
-          </Content>
-        </Layout>
+        
+        <Dashboard/>
       </>
     </Layout>
   );

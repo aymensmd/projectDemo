@@ -1,32 +1,17 @@
-// PrivateRoute.jsx
-import React, { createContext, useContext, useState } from 'react';
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { useStateContext } from '../contexts/ContextProvider';
 
-const PrivateRouteContext = createContext();
+const PrivateRoute = ({ element, allowedRoles }) => {
+  const { user, token } = useStateContext();
+  console.log('Token in PrivateRoute:', token);
+  console.log('User:', user);
 
-export const PrivateRouteProvider = ({ children }) => {
-  const [collapsed, setCollapsed] = useState(false);
-  const [selectedMenuItem, setSelectedMenuItem] = useState('dashboard');
+  // Check if user has any of the allowed roles
+  const hasAllowedRole = user && user.role && allowedRoles.includes(user.role.name);
+  console.log('Has Allowed Role:', hasAllowedRole);
 
-  
-
-  return (
-    <PrivateRouteContext.Provider
-      value={{
-        collapsed,
-        setCollapsed,
-        selectedMenuItem,
-        setSelectedMenuItem,
-      }}
-    >
-      {children}
-    </PrivateRouteContext.Provider>
-  );
+  return hasAllowedRole ? element : <Navigate to="/unauthorized" replace />;
 };
 
-export const usePrivateRouteContext = () => {
-  const context = useContext(PrivateRouteContext);
-  if (!context) {
-    throw new Error('usePrivateRouteContext must be used within a PrivateRouteProvider');
-  }
-  return context;
-};
+export default PrivateRoute;

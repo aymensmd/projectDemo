@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Layout, Menu } from 'antd';
+import { UserOutlined, TeamOutlined, CalendarOutlined, TableOutlined } from '@ant-design/icons';
 import EmployeViewComponent from './EmployeViewComponent';
 import UserTable from './UserTable';
+import EventsComponent from './EventsComponent';
 
 import { Outlet } from 'react-router-dom';
+import VacationComponent from './VacationComponent';
 
 const { Header } = Layout;
 
@@ -20,19 +23,17 @@ function UserSettingView({ onSelectMenuItem }) {
       case '1':
         return <EmployeViewComponent />;
       case '2':
-        return "todo";
+        return <VacationComponent />;
       case '3':
-        return <EmployeViewComponent />;
-      case '4':
-        return <EmployeViewComponent />;
+        return <EventsComponent />;
       default:
         return null;
     }
   };
 
   return (
-    <Layout>
-      <Header style={{ display: 'flex', alignItems: 'center' }}>
+    <Layout style={{ background: '#f4f8fb', minHeight: '100vh' }}>
+      <Header style={{ display: 'flex', alignItems: 'center', background: '#277dfe', boxShadow: '0 2px 8px #e6f0ff', borderRadius: '0 0 12px 12px', marginBottom: 16 }}>
         <div className="demo-logo" />
         <Menu
           onClick={handleMenuClick}
@@ -40,18 +41,30 @@ function UserSettingView({ onSelectMenuItem }) {
           mode="horizontal"
           defaultSelectedKeys={['1']}
           selectedKeys={[current]}
-          style={{ flex: 1, minWidth: 0 }}
-        >
-          <Menu.Item key="1" >
-            Gestion des comptes
-          </Menu.Item>
-          <Menu.Item key="2">Gestion des absences</Menu.Item>
-          <Menu.Item key="3">Gestion de congés</Menu.Item>
-          <Menu.Item key="4">Contact</Menu.Item>
-        </Menu>
+          style={{ flex: 1, minWidth: 0, background: 'transparent', fontWeight: 600, fontSize: 16, border: 'none' }}
+          items={[
+            {
+              key: '1',
+              icon: <TeamOutlined style={{ fontSize: 18, color: '#fff' }} />,
+              label: <span style={{ color: '#fff' }}>Gestion des comptes</span>,
+            },
+            {
+              key: '2',
+              icon: <CalendarOutlined style={{ fontSize: 18, color: '#fff' }} />,
+              label: <span style={{ color: '#fff' }}>Gestion des absences</span>,
+            },
+            {
+              key: '3',
+              icon: <TableOutlined style={{ fontSize: 18, color: '#fff' }} />,
+              label: <span style={{ color: '#fff' }}>Events</span>,
+            },
+          ]}
+        />
       </Header>
-      <Outlet />
-      {renderContent(current)}
+      <div style={{ padding: 24, background: 'transparent', minHeight: 400 }}>
+        <Outlet />
+        {renderContent(current)}
+      </div>
     </Layout>
   );
 }

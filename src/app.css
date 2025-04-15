@@ -1,82 +1,173 @@
- /* Main app */
- .header {
+/* Main app */
+html, body, #root {
+  height: 100%;
+}
+
+.header {
     padding-top: 12px;
-    background: #fff;
-   }
-   .content {
+    background: #9a8f8f !important;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+.content {
     margin: 12px 16px;
-    padding: 2px
-   }
-   .triger-btn {
-    font-size: 16px;
-    width: 50px;
-    height: 50px;
-    position: fixed;
-    bottom: 10px;
-    left: 10px;
-   }
-   /* Sider */
-   .sider { 
-    height: 100vh;
-    position: sticky !important;  
-    left: 0;
-    bottom: 0;
-    top: 0;
-    
-  }
-  .logo {
-    margin: 30px 0;
-    font-size: 1.5em;
-  }
-  .menu-bar {
+    padding: 2px;
+}
+
+/* Sider */
+.sider {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    font-weight: 500;
-  }
+    justify-content: space-between;
+    
+    height: auto; /* Ensures the sider height matches the viewport height */
+    overflow: hidden; /* Prevents scrolling within the sider */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 200px;
+    background: #fff;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.logo {
+    text-align: center;
+    margin-top: 80px;
+}
+
+.menu-bar {
   
-  .ant-menu-item-selected {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Trigger Button */
+.trigger-btn {
+    font-size: 18px;
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: none; /* Remove background color */
+    color: inherit; /* Inherit text color */
+    border: none; /* Remove border */
+    cursor: pointer;
+    border-radius: 50%;
+    box-shadow: none; /* Remove box-shadow */
+}
+
+/* Trigger Button Hover */
+.trigger-btn:hover {
+    color: #277dfe; /* Optional: Change text color on hover */
+}
+
+.ant-menu-item-selected {
     background-color: #277dfe !important;
     color: #fff !important;
-  }
-  /* header*/
-  
-  .header-icon {
-    background : #c8d3e3;
+}
+
+/* Header Icon */
+.header-icon {
+    background: #c8d3e3;
     padding: 8px;
     border-radius: 24px;
-    font-size: 18px;
+    font-size: 14px;
     color: #4f6f52;
     cursor: pointer;
-  }
-  /* button and color*/
-  
-  ant-btn:hover {
+}
+
+/* Button and Color */
+
+/* Fixed missing dot for 'ant-btn:hover' */
+.ant-btn:hover {
     color: #277dfe !important;
     border-color: #4f6f52 !important;
-  }
-   .ant-btn-primary {
+}
+
+.ant-btn-primary {
     background-color: #277dfe;
-   }
-   .ant-btn-primary:hover {
+}
+
+.ant-btn-primary:hover {
     background-color: #173a1a;
     color: #fff !important;
-   }
-   .primary--color {
-    color: #4f6f52 !important; 
-   }
-   .primary--light--color {
+}
+
+.primary--color {
+    color: #4f6f52 !important;
+}
+
+.primary--light--color {
     color: #739072 !important;
-   }
-  
-   .secondary--color {
+}
+
+.secondary--color {
     color: #86a789 !important;
-   }
-   .light--color {
+}
+
+.light--color {
     color: #d2e3c8 !important;
-   }
-   .gray--color {
+}
+
+.gray--color {
     color: rgb(182, 181, 181) !important;
-   }
-  
-  
+}
+
+/* Responsive Design */
+
+/* Adjust layout for tablets and smaller screens */
+@media (max-width: 768px) {
+    .sider {
+        height: auto; /* Adjust height for smaller screens */
+        width: 100%; /* Sidebar takes full width */
+        position: relative; /* No fixed position */
+        box-shadow: none; /* Remove shadow */
+    }
+
+    .content {
+        margin-left: 0; /* No margin for sidebar */
+        padding: 8px; /* Reduce padding */
+    }
+
+    .menu-bar {
+        flex-direction: row; /* Horizontal menu for smaller screens */
+        justify-content: space-around;
+    }
+}
+
+/* Adjust layout for mobile screens */
+@media (max-width: 480px) {
+    .sider {
+        height: auto; /* Adjust height for mobile screens */
+        width: 100%; /* Sidebar takes full width */
+        position: relative; /* No fixed position */
+        box-shadow: none; /* Remove shadow */
+    }
+
+    .menu-bar {
+        flex-direction: column; /* Stack menu items vertically */
+        align-items: flex-start;
+        padding: 8px;
+    }
+
+    .trigger-btn {
+        font-size: 14px; /* Adjust button size */
+        width: 50px;
+        height: 50px;
+    }
+
+    .header {
+        padding-top: 8px;
+    }
+
+    .header-icon {
+        font-size: 12px; /* Adjust icon size */
+        padding: 6px;
+    }
+}
+
