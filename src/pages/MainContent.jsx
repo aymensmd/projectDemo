@@ -122,9 +122,7 @@ const MainContent = () => {
                     </span>
                   </div>
                 }
-                style={{ width: 220, height: 210, minHeight: 210, maxHeight: 210, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', borderRadius: 7, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', background: '#fff', margin: 4, cursor: 'pointer', padding: 0 }}
-                headStyle={{ background: '#e6f0ff', borderRadius: '7px 7px 0 0', padding: '6px 12px' }}
-                bodyStyle={{ padding: '8px 12px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 0 }}
+                styles={{ header: { background: '#e6f0ff', borderRadius: '7px 7px 0 0', padding: '6px 12px' }, body: { padding: '8px 12px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 0 } }}
                 hoverable
                 onClick={() => openModal(event)}
               >
@@ -185,10 +183,10 @@ const MainContent = () => {
       </Card>
       <Modal
         title={selectedEvent ? selectedEvent.title : ''}
-        visible={modalVisible}
+        open={modalVisible}
         onCancel={closeModal}
         footer={null}
-        bodyStyle={{ borderRadius: 10, background: '#f9fbff', padding: 24 }}
+        styles={{ body: { borderRadius: 10, background: '#f9fbff', padding: 24 } }}
         style={{ top: 60 }}
       >
         {selectedEvent && (

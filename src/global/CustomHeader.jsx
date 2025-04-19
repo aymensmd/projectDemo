@@ -1,4 +1,4 @@
-import { MessageOutlined, NotificationOutlined, UserOutlined, BellOutlined } from '@ant-design/icons';
+import { MessageOutlined, NotificationOutlined, UserOutlined, BellOutlined, BgColorsOutlined } from '@ant-design/icons';
 import { Avatar, Flex, Dropdown, Menu, Card, Button, Badge, List, notification, Modal, Divider } from 'antd';
 import Typography from 'antd/es/typography/Typography';
 import React, { useEffect, useState } from 'react';
@@ -8,13 +8,14 @@ import { useStateContext } from '../contexts/ContextProvider';
 import axios from '../axios';
 
 const CostumHeader = () => {
-  const { setToken } = useStateContext();
+  const { setToken, theme, setTheme } = useStateContext();
   const navigate = useNavigate();
   const [user, setUser] = useState({});
   const [eventNotifications, setEventNotifications] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [popupEvent, setPopupEvent] = useState(null);
   const [popupVisible, setPopupVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     let intervalId;
@@ -145,6 +146,11 @@ const CostumHeader = () => {
     setPopupVisible(true);
   };
 
+  const handleThemeChange = (newTheme) => {
+    setTheme(newTheme);
+    setIsModalOpen(false);
+  };
+
   const menu = (
     <Card style={{ padding: '20px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', marginBottom: '20px' }}> {/* Added box styling */}
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
@@ -215,27 +221,72 @@ const CostumHeader = () => {
 
   return (
     <>
-      <Flex align='center' style={{ backgroundColor: '#fff', padding: '10px', boxShadow: '0 2px 8px  rgb(0, 0, 0)' }}> {/* Updated background color to match sidebar */}
-        <Typography.Title level={4} type='secondary'>
-          <img src={comunikcrm} width="120" alt="Logo" />
+      <Flex align='center' style={{ 
+        backgroundColor: '#fff', 
+        padding: '5px 15px', 
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', 
+        borderBottom: '1px solid #e6f0ff', 
+        height: '60px', 
+        alignItems: 'center' 
+      }}> 
+        <Typography.Title level={4} style={{ margin: 0, color: '#000', fontSize: '18px' }}>
+          <img src={comunikcrm} width="100" alt="Logo" style={{ marginRight: '10px', verticalAlign: 'middle' }} />
+         
         </Typography.Title>
-        <Flex align='center' gap='3rem' style={{ marginLeft: 'auto' }}>
-          <Dropdown overlay={notificationMenu} placement="bottomRight" trigger={['click']}>
+        <Flex align='center' gap='1.5rem' style={{ marginLeft: 'auto' }}>
+          <Dropdown 
+            dropdownRender={() => notificationMenu}
+            placement="bottomRight" 
+            trigger={['click']}
+          >
             <Badge count={eventNotifications.length} offset={[10, 0]}>
-              <Avatar size={40} icon={<BellOutlined />} style={{  cursor: 'pointer' }} />
+              <Avatar size={36} icon={<BellOutlined />} style={{ backgroundColor: '#fff', color: '#277dfe', cursor: 'pointer' }} />
             </Badge>
           </Dropdown>
-          <Dropdown overlay={menu} placement="bottomRight" trigger={['click']}>
-            <Avatar size={40} icon={<UserOutlined />} style={{ backgroundColor: '#1890ff', cursor: 'pointer' }} />
+          <Dropdown 
+            dropdownRender={() => menu}
+            placement="bottomRight" 
+            trigger={['click']}
+          >
+            <Avatar size={36} icon={<UserOutlined />} style={{ backgroundColor: '#fff', color: '#277dfe', cursor: 'pointer' }} />
           </Dropdown>
+          <Button
+            type="text"
+            icon={<BgColorsOutlined />}
+            onClick={() => setIsModalOpen(true)}
+            style={{ fontSize: 16, color: '#000' }}
+            aria-label="Switch theme"
+          />
         </Flex>
       </Flex>
+      <Modal
+        title="Choose Theme"
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        footer={null}
+        centered
+      >
+        <Flex gap="1rem" justify="center">
+          <Button
+            type={theme === 'light' ? 'primary' : 'default'}
+            onClick={() => handleThemeChange('light')}
+          >
+            Light
+          </Button>
+          <Button
+            type={theme === 'dark' ? 'primary' : 'default'}
+            onClick={() => handleThemeChange('dark')}
+          >
+            Dark
+          </Button>
+        </Flex>
+      </Modal>
       <Modal
         title={popupEvent ? popupEvent.title : ''}
         open={popupVisible}
         onCancel={() => setPopupVisible(false)}
         footer={null}
-        bodyStyle={{ borderRadius: 10, background: '#f9fbff', padding: 24 }}
+        styles={{ body: { borderRadius: 10, background: '#f9fbff', padding: 24 } }}
         style={{ top: 60 }}
       >
         {popupEvent && (

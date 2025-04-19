@@ -41,20 +41,19 @@ const Sidebar = ({ onSelectMenuItem }) => {
   };
 
   const items = [
-    getItem('Dashboard', 'app', <WindowsOutlined />),
-    { type: 'divider', style: { backgroundColor: '#d9d9d9' } }, // Darkened the divider line for better visibility
-    getItem('Profile', 'profile', <UserOutlined />),
-    getItem('Settings', 'settings', <SettingOutlined />),
-   
-    user && user.role.name === 'admin' && getItem('Ressources humains', 'HRmember', <UsergroupAddOutlined />, [
-      getItem('Gestion des employés', 'group', null, [
-        getItem('Gestion des profiles', 'users_setting', <UserOutlined />),
-        getItem('Gestion des congés', '2'),
+    getItem('Dashboard', '/dashboard', <WindowsOutlined />),
+    getItem('Profile', '/profile', <UserOutlined />),
+    getItem('Settings', '/settings', <UsergroupAddOutlined />),
+    getItem('User Settings', '/users_setting', <SettingOutlined />),
+    user?.role?.name === 'admin' && getItem('Ressources humains', 'hr', <UsergroupAddOutlined />, [
+      getItem('Gestion des employés', 'employees', null, [
+        getItem('Gestion des profiles', '/users_setting', <UserOutlined />),
+        getItem('Gestion des congés', 'leaves'),
       ], 'group'),
     ]),
-  
+    getItem('Chat', '/dash/chat', <MessageOutlined />),
     getItem('logout', 'logout', loggingOut ? <Spin /> : <LogoutOutlined />),
-  ].filter(Boolean); // This will filter out any false values
+  ].filter(Boolean);
 
   return (
     <Menu

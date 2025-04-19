@@ -95,9 +95,8 @@ const ProfilePage = () => {
     const fetchUserVacations = async (userId) => {
       setLoadingVacations(true);
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/vacations');
-        const userVacations = response.data.filter(vac => vac.user_id === userId);
-        setVacations(userVacations);
+        const response = await axios.get(`http://127.0.0.1:8000/api/vacations/${userId}`);
+        setVacations(response.data);
       } catch (error) {
         setVacations([]);
       } finally {

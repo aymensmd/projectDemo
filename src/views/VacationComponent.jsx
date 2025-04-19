@@ -66,7 +66,7 @@ function ToolBox({ tool, expandedTool, setExpandedTool, onMouseEnter, onMouseLea
   return (
     <div
       style={{
-        width: isOpen ? 180 : 90,
+        width: isOpen ? '100%' : 90,
         height: isOpen ? 180 : 90,
         borderRadius: 18,
         boxShadow: isOpen ? '0 4px 24px #dbeafe' : '0 1px 4px #e6f0ff',
@@ -346,7 +346,7 @@ const VacationComponent = () => {
             message.error('Failed to update day off request');
         }
     }
-};
+  };
 
   // Stats for quick overview
   const totalUsers = userData.length;
@@ -357,8 +357,8 @@ const VacationComponent = () => {
   const refused = allRequests.filter(r => r.status === 'Refusé').length;
 
   return (
-    <>
-      <Row gutter={16}>
+    <div style={{ padding: '16px' }}>
+      <Row gutter={[16, 16]}>
         <Col xs={24} md={6}>
           <Card style={{ marginBottom: 16, borderRadius: 12, background: '#fffbe6', boxShadow: '0 2px 8px #ffe58f' }}>
             <Title level={5} style={{ marginBottom: 4 }}>Legend</Title>
@@ -372,78 +372,73 @@ const VacationComponent = () => {
           </Card>
         </Col>
         <Col xs={24} md={18}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 32, marginBottom: 32 }}>
-            <Card 
-              title={<div style={{ width: '100%', textAlign: 'center', fontWeight: 700, fontSize: 18, letterSpacing: 1 }}>Tools</div>} 
-              bordered={false} 
-              style={{ 
-                borderRadius: 18, 
-                background: '#fff', 
-                boxShadow: '0 4px 16px #e6f0ff', 
-                minWidth: 340, 
-                display: 'flex', 
-                alignItems: 'flex-start', 
-                justifyContent: 'flex-start', 
-                padding: 32, 
-                border: '1px solid #e6f0ff',
-                marginBottom: 32
-              }}
-            >
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(2, 90px)', 
-                gap: 18, 
-                justifyContent: 'flex-start', 
-                alignItems: 'center', 
-                width: '100%', 
-                minHeight: 198, 
-                position: 'relative', 
-                overflow: 'visible',
-                padding: 8
-              }}>
-                {['calendar', 'watch', 'weather', 'quote'].map((tool) => (
-                  <ToolBox
-                    key={tool}
-                    tool={tool}
-                    expandedTool={expandedTool}
-                    setExpandedTool={setExpandedTool}
-                    onMouseEnter={() => setExpandedTool(tool)}
-                    onMouseLeave={() => setExpandedTool(null)}
-                  />
-                ))}
-              </div>
-            </Card>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div style={{ display: 'flex', gap: 16 }}>
-                <div style={{ width: 80, height: 80, borderRadius: 16, background: '#fff', boxShadow: '0 1px 4px #e6f0ff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-                  <Statistic title={<span style={{ color: '#277dfe', fontWeight: 600, fontSize: 11 }}>Total Users</span>} value={totalUsers} valueStyle={{ color: '#277dfe', fontWeight: 700, fontSize: 16 }} />
-                </div>
-                <div style={{ width: 80, height: 80, borderRadius: 16, background: '#fff', boxShadow: '0 1px 4px #e6f0ff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-                  <Statistic title={<span style={{ color: '#389e0d', fontWeight: 600, fontSize: 11 }}>Approved</span>} value={approved} valueStyle={{ color: '#389e0d', fontWeight: 700, fontSize: 16 }} />
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: 16 }}>
-                <div style={{ width: 80, height: 80, borderRadius: 16, background: '#fff', boxShadow: '0 1px 4px #e6f0ff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-                  <Statistic title={<span style={{ color: '#faad14', fontWeight: 600, fontSize: 11 }}>Total Requests</span>} value={totalRequests} valueStyle={{ color: '#faad14', fontWeight: 700, fontSize: 16 }} />
-                </div>
-                <div style={{ width: 80, height: 80, borderRadius: 16, background: '#fff', boxShadow: '0 1px 4px #e6f0ff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-                  <Statistic title={<span style={{ color: '#faad14', fontWeight: 600, fontSize: 11 }}>Pending</span>} value={pending} valueStyle={{ color: '#faad14', fontWeight: 700, fontSize: 16 }} />
-                </div>
-                <div style={{ width: 80, height: 80, borderRadius: 16, background: '#fff', boxShadow: '0 1px 4px #e6f0ff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-                  <Statistic title={<span style={{ color: '#cf1322', fontWeight: 600, fontSize: 11 }}>Refused</span>} value={refused} valueStyle={{ color: '#cf1322', fontWeight: 700, fontSize: 16 }} />
-                </div>
-              </div>
+          <Card 
+            title={<div style={{ width: '100%', textAlign: 'center', fontWeight: 700, fontSize: 18, letterSpacing: 1 }}>Tools</div>} 
+            bordered={false} 
+            style={{ 
+              borderRadius: 18, 
+              background: '#fff', 
+              boxShadow: '0 4px 16px #e6f0ff', 
+              marginBottom: 16,
+              border: '1px solid #e6f0ff',
+            }}
+          >
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))',
+              gap: 16,
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+              position: 'relative', 
+              overflow: 'visible',
+              padding: 8
+            }}>
+              {['calendar', 'watch', 'weather', 'quote'].map((tool) => (
+                <ToolBox
+                  key={tool}
+                  tool={tool}
+                  expandedTool={expandedTool}
+                  setExpandedTool={setExpandedTool}
+                  onMouseEnter={() => setExpandedTool(tool)}
+                  onMouseLeave={() => setExpandedTool(null)}
+                />
+              ))}
             </div>
+          </Card>
+
+          <div style={{ 
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
+            gap: 16,
+            marginBottom: 16
+          }}>
+            <Card style={{ borderRadius: 16, background: '#fff', boxShadow: '0 1px 4px #e6f0ff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 0' }}>
+              <Statistic title={<span style={{ color: '#277dfe', fontWeight: 600, fontSize: 11 }}>Total Users</span>} value={totalUsers} valueStyle={{ color: '#277dfe', fontWeight: 700, fontSize: 16 }} />
+            </Card>
+            <Card style={{ borderRadius: 16, background: '#fff', boxShadow: '0 1px 4px #e6f0ff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 0' }}>
+              <Statistic title={<span style={{ color: '#389e0d', fontWeight: 600, fontSize: 11 }}>Approved</span>} value={approved} valueStyle={{ color: '#389e0d', fontWeight: 700, fontSize: 16 }} />
+            </Card>
+            <Card style={{ borderRadius: 16, background: '#fff', boxShadow: '0 1px 4px #e6f0ff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 0' }}>
+              <Statistic title={<span style={{ color: '#faad14', fontWeight: 600, fontSize: 11 }}>Total Requests</span>} value={totalRequests} valueStyle={{ color: '#faad14', fontWeight: 700, fontSize: 16 }} />
+            </Card>
+            <Card style={{ borderRadius: 16, background: '#fff', boxShadow: '0 1px 4px #e6f0ff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 0' }}>
+              <Statistic title={<span style={{ color: '#faad14', fontWeight: 600, fontSize: 11 }}>Pending</span>} value={pending} valueStyle={{ color: '#faad14', fontWeight: 700, fontSize: 16 }} />
+            </Card>
+            <Card style={{ borderRadius: 16, background: '#fff', boxShadow: '0 1px 4px #e6f0ff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '12px 0' }}>
+              <Statistic title={<span style={{ color: '#cf1322', fontWeight: 600, fontSize: 11 }}>Refused</span>} value={refused} valueStyle={{ color: '#cf1322', fontWeight: 700, fontSize: 16 }} />
+            </Card>
           </div>
-          <Card style={{ flex: 1, background: '#f0f5ff', borderRadius: 12, boxShadow: '0 2px 8px #e6f0ff', marginRight: 16 }}>
+
+          <Card style={{ background: '#f0f5ff', borderRadius: 12, boxShadow: '0 2px 8px #e6f0ff' }}>
             <h2 style={{ color: '#277dfe', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}><TeamOutlined /> Liste des Vacances</h2>
             <List
               grid={{
                 gutter: 16,
                 xs: 1,
                 sm: 2,
-                md: 3,
-                lg: 4,
+                md: 2,
+                lg: 3,
                 xl: 4,
                 xxl: 4,
               }}
@@ -466,6 +461,7 @@ const VacationComponent = () => {
               expandedRowKeys={expandedRowKeys}
               onExpand={(expanded, record) => toggleExpand(record.key)}
               style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #e6f0ff', marginTop: 24 }}
+              scroll={{ x: true }}
             />
           </Card>
         </Col>
@@ -474,10 +470,9 @@ const VacationComponent = () => {
         title={<span style={{ color: '#277dfe', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}><UserOutlined /> Informations Utilisateur</span>}
         placement="right"
         onClose={closeDrawer}
-        visible={drawerVisible}
-        width={420}
-        bodyStyle={{ background: '#f9fbff', borderRadius: 12 }}
-        headerStyle={{ background: '#277dfe', color: '#fff', borderRadius: '12px 12px 0 0' }}
+        open={drawerVisible}
+        width={Math.min(420, window.innerWidth * 0.9)}
+        styles={{ body: { background: '#f9fbff', borderRadius: 12 }, header: { background: '#277dfe', color: '#fff', borderRadius: '12px 12px 0 0' } }}
       >
         {selectedVacation && (
           <>
@@ -516,7 +511,7 @@ const VacationComponent = () => {
           </>
         )}
       </Drawer>
-    </>
+    </div>
   );
 };
 

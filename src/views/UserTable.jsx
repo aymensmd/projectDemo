@@ -1,35 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Input, Button, message, Drawer, Form, Input as AntInput } from 'antd';
+import { Card, Table, Input, Button, message, Drawer, Form, Input as AntInput, Select, Space, Popconfirm } from 'antd';
 import { SearchOutlined, UserOutlined, InfoCircleOutlined, DownloadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import dayjs from 'dayjs';
+import { useRealTimeData } from '../hooks/useRealTimeData';
 
-const UsersView = ({ employees = [] }) => {
+const { Option } = Select;
+
+const UserTable = () => {
   const [searchText, setSearchText] = useState('');
   const [department, setDepartment] = useState('');
-  const [updateDrawerVisible, setUpdateDrawerVisible] = useState(false);
+  const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [filtered, setFiltered] = useState(employees);
+  const [form] = Form.useForm();
+  
+  // Use real-time data hook for users
+  const { data: users, loading, error, refresh } = useRealTimeData('http://127.0.0.1:8000/api/employees');
 
   // Compute unique department options
-  const departmentOptions = Array.from(new Set(employees.map(e => e.department).filter(Boolean)));
+  const departmentOptions = [
+    { id: 1, name: 'Sales' },
+    { id: 2, name: 'IT' },
+    { id: 3, name: 'HR' },
+    { id: 4, name: 'Marketing' },
+    { id: 5, name: 'Finance' },
+  ]; // Replace with actual API call if needed
 
   useEffect(() => {
-    setFiltered(
-      employees.filter(user =>
-        (user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-         user.email.toLowerCase().includes(searchText.toLowerCase()) ||
-         (user.department && user.department.toLowerCase().includes(searchText.toLowerCase()))) &&
-        (department ? user.department === department : true)
-      )
-    );
-  }, [searchText, employees, department]);
-
-  useEffect(() => {
+    console.log('Fetched users:', users); // Log the users data to inspect its structure
     const handler = (e) => exportToCSV(e.detail);
     window.addEventListener('export-employees-csv', handler);
     return () => window.removeEventListener('export-employees-csv', handler);
-  }, []);
+  }, [users]);
 
   const exportToCSV = (data) => {
     if (!data || !data.length) return;
@@ -48,64 +50,106 @@ const UsersView = ({ employees = [] }) => {
     window.URL.revokeObjectURL(url);
   };
 
-  const handleUpdate = (user) => {
-    setSelectedUser(user);
-    setUpdateDrawerVisible(true);
-  };
-
-  const handleDrawerClose = () => {
-    setSelectedUser(null);
-    setUpdateDrawerVisible(false);
-  };
-
-  const handleUpdateFormSubmit = async (updatedUser) => {
+  const handleUpdateFormSubmit = async (values) => {
     try {
-      const response = await axios.put(`http://127.0.0.1:8000/api/users/${updatedUser.id}`, updatedUser);
-      setFiltered(filtered.map(user => (user.id === updatedUser.id ? response.data : user)));
+      const token = localStorage.getItem('ACCESS_TOKEN');
+      const updatedData = {
+        ...values,
+        department: { name: values.department }, // Adjusted to match API structure
+        role: { name: values.role }, // Adjusted to match API structure
+      };
+      await axios.put(`http://127.0.0.1:8000/api/employees/${selectedUser.id}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+      });
+
       message.success('User updated successfully');
-      handleDrawerClose();
+      setDrawerVisible(false);
+      refresh(); // Refresh data after update
     } catch (error) {
-      console.error('Error updating user:', error);
       message.error('Failed to update user');
+      console.error('Update error:', error);
     }
   };
 
-  const handleDelete = async (userId) => {
+  const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/employees/${userId}`);
-      setFiltered(filtered.filter(user => user.id !== userId));
+      const token = localStorage.getItem('ACCESS_TOKEN');
+      await axios.delete(`http://127.0.0.1:8000/api/employees/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      });
+      
       message.success('User deleted successfully');
+      refresh(); // Refresh data after delete
     } catch (error) {
-      console.error('Error deleting user:', error);
       message.error('Failed to delete user');
+      console.error('Delete error:', error);
     }
   };
 
   const columns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Email', dataIndex: 'email', key: 'email', width: 200 },
-    { title: 'Address', dataIndex: 'adress', key: 'adress' },
-    { title: 'Phone', dataIndex: 'phone_number', key: 'phone_number' },
-    { title: 'SOS Number', dataIndex: 'sos_number', key: 'sos_number' },
-    { title: 'Social Situation', dataIndex: 'social_situation', key: 'social_situation' },
-    { title: 'Department', dataIndex: 'department', key: 'department' },
-    { title: 'Date d\'embauche', dataIndex: 'created_at', key: 'created_at', render: d => d ? dayjs(d).format('DD/MM/YYYY') : '-' },
-    { title: 'Anniversaire', dataIndex: 'birthday', key: 'birthday', render: d => d ? dayjs(d).format('DD/MM') : '-' },
     {
-      title: 'Action',
-      key: 'action',
-      render: (text, record) => (
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <Button type="link" onClick={() => handleUpdate(record)} style={{ color: '#1890ff' }}>
-            Update
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
+      title: 'Department',
+      dataIndex: 'department_id',
+      key: 'department',
+      render: (departmentId) => {
+        const department = departmentOptions.find(dep => dep.id === departmentId);
+        return department ? department.name : 'N/A';
+      },
+    },
+    {
+      title: 'Role',
+      dataIndex: ['role', 'name'],
+      key: 'role',
+      render: (role) => role || 'N/A',
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, record) => (
+        <Space size="middle">
+          <Button type="primary" onClick={() => {
+            setSelectedUser(record);
+            form.setFieldsValue({
+              ...record,
+              department: record.department_id,
+              role: record.role?.name,
+            });
+            setDrawerVisible(true);
+          }}>
+            Edit
           </Button>
-          <Button type="link" danger onClick={() => handleDelete(record.id)}>
-            Delete
-          </Button>
-        </div>
+          <Popconfirm
+            title="Are you sure you want to delete this user?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="primary" danger>Delete</Button>
+          </Popconfirm>
+        </Space>
       ),
     },
   ];
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div>
@@ -121,84 +165,52 @@ const UsersView = ({ employees = [] }) => {
       <div style={{ margin: '8px 0 16px 0', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         <Button size="small" onClick={() => setDepartment('')} type={!department ? 'primary' : 'default'}>Tous</Button>
         {departmentOptions.map(dep => (
-          <Button key={dep} size="small" onClick={() => setDepartment(dep)} type={department === dep ? 'primary' : 'default'}>{dep}</Button>
+          <Button key={dep.id} size="small" onClick={() => setDepartment(dep.name)} type={department === dep.name ? 'primary' : 'default'}>{dep.name}</Button>
         ))}
       </div>
       <Button onClick={() => setSearchText('')} style={{ marginBottom: 16 }}>Reset</Button>
       <Table
-        columns={columns.map(col =>
-          col.key === 'action'
-            ? { ...col, width: 120, align: 'center' }
-            : { ...col, title: <span style={{ color: '#277dfe', fontWeight: 600, fontSize: 15 }}>{col.title}</span>, align: 'center', render: col.render || ((text) => <span style={{ color: '#222' }}>{text}</span>) }
-        )}
-        size='small'
-        dataSource={filtered}
+        columns={columns}
+        dataSource={users}
+        loading={loading}
         rowKey="id"
         scroll={{ x: 'max-content' }}
         style={{ background: '#f0f5ff', borderRadius: 12, boxShadow: '0 2px 8px #e6f0ff', marginTop: 16 }}
       />
+
       <Drawer
-        title="modifier"
+        title="Edit User"
         placement="right"
-        onClose={handleDrawerClose}
-        visible={updateDrawerVisible}
-        destroyOnClose={true}
-        width={window.innerWidth > 768 ? 500 : '100%'}
+        onClose={() => setDrawerVisible(false)}
+        visible={drawerVisible}
+        width={500}
       >
         <Form
           layout="vertical"
+          form={form}
           onFinish={handleUpdateFormSubmit}
-          initialValues={selectedUser}
         >
           <Form.Item name="id" style={{ display: 'none' }}>
-            <AntInput />
+            <Input />
           </Form.Item>
           <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Please enter name' }]}>
-            <AntInput />
+            <Input />
           </Form.Item>
           <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Please enter email' }]}>
-            <AntInput />
+            <Input />
           </Form.Item>
-          <Form.Item name="address" label="Address">
-            <AntInput />
+          <Form.Item name="department" label="Department" rules={[{ required: true, message: 'Please select department' }]}>
+            <Select>
+              {departmentOptions.map(dep => (
+                <Option key={dep.id} value={dep.id}>{dep.name}</Option>
+              ))}
+            </Select>
           </Form.Item>
-          <Form.Item name="phone_number" label="Phone Number" rules={[
-            { 
-              required: true, 
-              message: 'Please enter phone number' 
-            },
-            {         
-              pattern: /^[0-9]+$/,
-              message: 'Please enter a valid phone number'
-            }
-          ]}>
-            <AntInput />
-          </Form.Item>
-          <Form.Item name="sos_number" label="SOS Number" rules={[
-            { 
-              required: true, 
-              message: 'Please enter phone number' 
-            },
-            {         
-              pattern: /^[0-9]+$/,
-              message: 'Please enter a valid phone number'
-            }
-          ]}>
-            <AntInput />
-          </Form.Item>
-          <Form.Item
-            name="social_situation"
-            label="Social Situation"
-            rules={[{ required: true, message: 'Please select social situation' }]}
-          >
-            <AntInput />
-          </Form.Item>
-          <Form.Item
-            name="department"
-            label="Department"
-            rules={[{ required: true, message: 'Please select department' }]}
-          >
-            <AntInput />
+          <Form.Item name="role" label="Role" rules={[{ required: true, message: 'Please select role' }]}>
+            <Select>
+              <Option value="Admin">Admin</Option>
+              <Option value="Moderator">Moderator</Option>
+            </Select>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">Update</Button>
@@ -209,4 +221,4 @@ const UsersView = ({ employees = [] }) => {
   );
 };
 
-export default UsersView;
+export default UserTable;

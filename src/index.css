@@ -7,5 +7,6 @@
 }
 
 body {
-  background-color: #dde6ed
+  /* Remove hardcoded background, use theme instead */
+  background-color: unset;
 }

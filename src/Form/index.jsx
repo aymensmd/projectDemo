@@ -17,6 +17,8 @@ const formItemLayout = {
 };
 
 const AddUser = () => {
+  const [form] = Form.useForm();
+
   const onFinish = async (values) => {
     try {
       // Set role_id based on the selected role
@@ -35,15 +37,28 @@ const AddUser = () => {
         case '6' : values.department = 'telecom'; break;
       }
 
+      // Prepare the data to be sent
+      const userData = {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        dateOfBirth: values.dateOfBirth,
+        genre: values.genre,
+        adress: values.adress,
+        phone_number: values.phone_number,
+        sos_number: values.sos_number,
+        social_situation: values.social_situation,
+        role_id: values.role_id,
+        department_id: values.department_id,
+        department: values.department
+      };
+
       // Send the form data to the API endpoint
-      const response = await axios.post('http://127.0.0.1:8000/api/store', values);
+      const response = await axios.post('http://127.0.0.1:8000/api/store', userData);
 
       console.log('Registration successful', response.data);
-
-      // Handle the registration success logic here
       message.success('Registration successful');
-
-      // Redirect to the login page after successful registration
+      form.resetFields();
 
     } catch (error) {
       console.error('Registration failed', error);
@@ -64,6 +79,7 @@ const AddUser = () => {
       <Divider />
       <Form
         {...formItemLayout}
+        form={form}
         style={{
           maxWidth: 700, // Adjust the max width of the form
           padding: '20px', // Add padding for better spacing
@@ -119,6 +135,32 @@ const AddUser = () => {
 
           <Col xs={24} sm={12}>
             <Form.Item
+              label="Genre"
+              name="genre"
+              rules={[
+                { required: true, message: 'Please select your gender!' },
+                {
+                  validator: (_, value) => {
+                    if (!value || (value !== 'Male' && value !== 'Female')) {
+                      return Promise.reject('Please select either Male or Female');
+                    }
+                    return Promise.resolve();
+                  }
+                }
+              ]}
+            >
+              <Select 
+                style={{ width: '100%' }}
+                placeholder="Select Gender"
+              >
+                <Option value="Male">Male</Option>
+                <Option value="Female">Female</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+
+          <Col xs={24} sm={12}>
+            <Form.Item
               label="Adresse"
               name="adress"
               rules={[{ required: true, message: 'Please input your address!' }]}
@@ -133,7 +175,7 @@ const AddUser = () => {
               name="phone_number"
               rules={[
                 { required: true, message: 'Please input your phone number!' },
-                { pattern: /^\d{8}$/, message: 'Please enter a valid 10-digit phone number!' }
+                { pattern: /^\d{8}$/, message: 'Please enter a valid 8-digit phone number!' }
               ]}
             >
               <Input />
@@ -146,7 +188,7 @@ const AddUser = () => {
               name="sos_number"
               rules={[
                 { required: true, message: 'Please input your emergency number!' },
-                { pattern: /^\d{8}$/, message: 'Please enter a valid 10-digit phone number!' }
+                { pattern: /^\d{8}$/, message: 'Please enter a valid 8-digit phone number!' }
               ]}
             >
               <Input />

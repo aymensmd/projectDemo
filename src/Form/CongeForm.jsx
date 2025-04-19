@@ -113,7 +113,7 @@ const DayOffRequestForm = () => {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-    }}>
+    }}> 
       <h2 style={{
         textAlign: 'center',
         fontWeight: 700,

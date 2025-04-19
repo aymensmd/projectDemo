@@ -146,7 +146,7 @@ const VacData = ({ setTotalVacationDays }) => {
   return (
     <Card
       style={{ maxWidth: 900, margin: '0 auto', boxShadow: '0 2px 8px #f0f1f2' }}
-      bodyStyle={{ padding: 24 }}
+      styles={{ body: { padding: 24 } }}
       title={<Title level={3} style={{ margin: 0, color: '#1677ff' }}>Mes Vacances</Title>}
       bordered={false}
     >

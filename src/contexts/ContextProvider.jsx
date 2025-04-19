@@ -4,7 +4,9 @@ const StateContext = createContext({
     user: null,
     token: null,
     setUser: () => {},
-    setToken: () => {}
+    setToken: () => {},
+    theme: 'light',
+    setTheme: () => {}
 });
 
 export const ContextProvider = ({ children }) => {
@@ -14,6 +16,10 @@ export const ContextProvider = ({ children }) => {
     });
     
     const [token, _setToken] = useState(() => localStorage.getItem('ACCESS_TOKEN'));
+
+    const [theme, _setTheme] = useState(() => {
+        return localStorage.getItem('APP_THEME') || 'light';
+    });
 
     useEffect(() => {
         const storedToken = localStorage.getItem("ACCESS_TOKEN");
@@ -40,13 +46,20 @@ export const ContextProvider = ({ children }) => {
         _setUser(user);
     };
 
+    const setTheme = (theme) => {
+        _setTheme(theme);
+        localStorage.setItem('APP_THEME', theme);
+    };
+
     return (
         <StateContext.Provider
             value={{
                 user,
                 token,
                 setUser,
-                setToken
+                setToken,
+                theme,
+                setTheme
             }}
         >
             {children}
