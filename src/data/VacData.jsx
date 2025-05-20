@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Badge, Button, Card, Drawer, Form, Input, Space, Table, message, DatePicker, Select, Popconfirm, Typography } from 'antd';
+import { Badge, Button, Card, Drawer, Form, Input, Space, Table, DatePicker, Select, Popconfirm, Typography, Spin, App } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
+import { useStateContext } from '../contexts/ContextProvider'; // Adjust path as needed
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -19,36 +20,44 @@ const vacationTypes = [
 ];
 
 const VacData = ({ setTotalVacationDays }) => {
+  const { message } = App.useApp();
+  const { token, user } = useStateContext();
   const [vacationData, setVacationData] = useState([]);
   const [updateDrawerVisible, setUpdateDrawerVisible] = useState(false);
   const [selectedVacation, setSelectedVacation] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchVacations();
-  }, []);
+    if (token && user?.id) {
+      fetchVacations();
+    } else {
+      message.error('Authentication required');
+    }
+  }, [token, user]);
 
   const fetchVacations = async () => {
+    setLoading(true);
     try {
-      const token = localStorage.getItem('ACCESS_TOKEN');
-      const userId = localStorage.getItem('USER_ID');
-
-      if (!token) {
-        message.error('User is not authenticated');
-        return;
-      }
-
-      const response = await axios.get(`http://127.0.0.1:8000/api/vacations/${userId}`, {
+      const response = await axios.get(`http://127.0.0.1:8000/api/vacations/${user.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      setVacationData(response.data);
-      calculateTotalVacationDays(response.data);
+      if (response.data && Array.isArray(response.data)) {
+        setVacationData(response.data);
+        calculateTotalVacationDays(response.data);
+      } else {
+        message.warning('No vacation data found');
+        setVacationData([]);
+      }
     } catch (error) {
-      console.error('Failed to fetch vacations', error);
-      message.error('Failed to fetch vacations');
+      console.error('Failed to fetch vacations:', error);
+      message.error(error.response?.data?.message || 'Failed to fetch vacations');
+      setVacationData([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,12 +66,20 @@ const VacData = ({ setTotalVacationDays }) => {
     vacations
       .filter(vacation => vacation.status === 'Approuvé')
       .forEach(vacation => {
-        const startDate = new Date(vacation.start_date);
-        const endDate = new Date(vacation.end_date);
-        const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+        const startDate = dayjs(vacation.start_date);
+        const endDate = dayjs(vacation.end_date);
+        const days = endDate.diff(startDate, 'day') + 1;
         totalDays += days;
       });
     setTotalVacationDays(totalDays);
+  };
+
+  const validateDates = (_, value) => {
+    const startDate = form.getFieldValue('start_date');
+    if (startDate && value && value.isBefore(startDate, 'day')) {
+      return Promise.reject('End date must be after start date');
+    }
+    return Promise.resolve();
   };
 
   const columns = [
@@ -70,25 +87,25 @@ const VacData = ({ setTotalVacationDays }) => {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      render: (type) => <span style={{ fontWeight: 500 }}>{type}</span>,
+      render: (type) => <span style={{ fontWeight: 500 }}>{type || '-'}</span>,
     },
     {
       title: 'Raison',
       dataIndex: 'reason',
       key: 'reason',
-      render: (reason) => <span style={{ color: '#888' }}>{reason}</span>,
+      render: (reason) => <span style={{ color: '#888' }}>{reason || '-'}</span>,
     },
     {
       title: 'Date de début',
       dataIndex: 'start_date',
       key: 'start_date',
-      render: (date) => dayjs(date).format('DD MMM YYYY'),
+      render: (date) => date ? dayjs(date).format('DD MMM YYYY') : '-',
     },
     {
       title: 'Date de fin',
       dataIndex: 'end_date',
       key: 'end_date',
-      render: (date) => dayjs(date).format('DD MMM YYYY'),
+      render: (date) => date ? dayjs(date).format('DD MMM YYYY') : '-',
     },
     {
       title: 'Statut',
@@ -100,7 +117,7 @@ const VacData = ({ setTotalVacationDays }) => {
               record.status === 'Approuvé' ? 'success' :
               record.status === 'Refusé' ? 'error' : 'processing'
             }
-            text={record.status}
+            text={record.status || 'Pending'}
           />
           {record.status === 'Pending' && (
             <Button type="link" onClick={() => showUpdateDrawer(record)}>Modifier</Button>
@@ -116,13 +133,11 @@ const VacData = ({ setTotalVacationDays }) => {
   const showUpdateDrawer = (vacation) => {
     setSelectedVacation(vacation);
     setUpdateDrawerVisible(true);
-    setTimeout(() => {
-      form.setFieldsValue({
-        ...vacation,
-        start_date: dayjs(vacation.start_date),
-        end_date: dayjs(vacation.end_date),
-      });
-    }, 0);
+    form.setFieldsValue({
+      ...vacation,
+      start_date: vacation.start_date ? dayjs(vacation.start_date) : null,
+      end_date: vacation.end_date ? dayjs(vacation.end_date) : null,
+    });
   };
 
   const closeUpdateDrawer = () => {
@@ -131,16 +146,45 @@ const VacData = ({ setTotalVacationDays }) => {
     form.resetFields();
   };
 
-  const handleUpdateFormSubmit = (values) => {
-    message.success('Vacation updated successfully');
-    closeUpdateDrawer();
-    fetchVacations(); // Refresh vacations data
+  const handleUpdateFormSubmit = async (values) => {
+    try {
+      const response = await axios.put(
+        `http://127.0.0.1:8000/api/vacations/${selectedVacation.id}`,
+        {
+          ...values,
+          start_date: values.start_date.format('YYYY-MM-DD'),
+          end_date: values.end_date.format('YYYY-MM-DD'),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      message.success('Demande mise à jour avec succès');
+      closeUpdateDrawer();
+      fetchVacations();
+    } catch (error) {
+      console.error('Update error:', error);
+      message.error(error.response?.data?.message || 'Échec de la mise à jour');
+    }
   };
 
-  const handleDeleteVacation = () => {
-    message.success('Vacation deleted successfully');
-    closeUpdateDrawer();
-    fetchVacations(); // Refresh vacations data
+  const handleDeleteVacation = async () => {
+    try {
+      await axios.delete(`http://127.0.0.1:8000/api/vacations/${selectedVacation.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      message.success('Demande supprimée avec succès');
+      closeUpdateDrawer();
+      fetchVacations();
+    } catch (error) {
+      console.error('Delete error:', error);
+      message.error(error.response?.data?.message || 'Échec de la suppression');
+    }
   };
 
   return (
@@ -150,14 +194,20 @@ const VacData = ({ setTotalVacationDays }) => {
       title={<Title level={3} style={{ margin: 0, color: '#1677ff' }}>Mes Vacances</Title>}
       bordered={false}
     >
-      <Table
-        columns={columns}
-        dataSource={vacationData}
-        pagination={false}
-        rowKey={(record) => record.id}
-        style={{ marginTop: 16, background: '#fff', borderRadius: 8 }}
-        size="middle"
-      />
+      <Spin spinning={loading}>
+        <Table
+          columns={columns}
+          dataSource={vacationData}
+          pagination={false}
+          rowKey={(record) => record.id}
+          style={{ marginTop: 16, background: '#fff', borderRadius: 8 }}
+          size="middle"
+          locale={{
+            emptyText: 'Aucune demande de vacances trouvée'
+          }}
+        />
+      </Spin>
+
       <Drawer
         title={<span style={{ color: '#1677ff' }}>Modifier la demande de congé</span>}
         placement="right"
@@ -171,28 +221,50 @@ const VacData = ({ setTotalVacationDays }) => {
             layout="vertical"
             form={form}
             onFinish={handleUpdateFormSubmit}
-            initialValues={{
-              ...selectedVacation,
-              start_date: dayjs(selectedVacation.start_date),
-              end_date: dayjs(selectedVacation.end_date),
-            }}
           >
-            <Form.Item name="start_date" label="Date de début" rules={[{ required: true }]}> 
-              <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
+            <Form.Item 
+              name="start_date" 
+              label="Date de début" 
+              rules={[{ required: true, message: 'Veuillez sélectionner une date de début' }]}
+            >
+              <DatePicker 
+                style={{ width: '100%' }} 
+                format="DD/MM/YYYY" 
+                disabledDate={(current) => current && current < dayjs().startOf('day')}
+              />
             </Form.Item>
-            <Form.Item name="end_date" label="Date de fin" rules={[{ required: true }]}> 
-              <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
+            
+            <Form.Item 
+              name="end_date" 
+              label="Date de fin" 
+              rules={[
+                { required: true, message: 'Veuillez sélectionner une date de fin' },
+                { validator: validateDates }
+              ]}
+            >
+              <DatePicker 
+                style={{ width: '100%' }} 
+                format="DD/MM/YYYY" 
+                disabledDate={(current) => current && current < dayjs().startOf('day')}
+              />
             </Form.Item>
-            <Form.Item name="type" label="Type" rules={[{ required: true }]}> 
+            
+            <Form.Item 
+              name="type" 
+              label="Type" 
+              rules={[{ required: true, message: 'Veuillez sélectionner un type' }]}
+            >
               <Select placeholder="Sélectionner le type">
                 {vacationTypes.map(type => (
                   <Option key={type} value={type}>{type}</Option>
                 ))}
               </Select>
             </Form.Item>
+            
             <Form.Item name="reason" label="Raison">
               <Input.TextArea rows={2} placeholder="Raison du congé" />
             </Form.Item>
+            
             <Form.Item>
               <Space>
                 <Button type="primary" htmlType="submit">Modifier</Button>

@@ -1,117 +1,77 @@
-import { MessageOutlined, NotificationOutlined, UserOutlined, BellOutlined, BgColorsOutlined } from '@ant-design/icons';
-import { Avatar, Flex, Dropdown, Menu, Card, Button, Badge, List, notification, Modal, Divider } from 'antd';
-import Typography from 'antd/es/typography/Typography';
+import { 
+  BellOutlined, 
+  UserOutlined, 
+  SunOutlined, 
+  MoonOutlined,
+  QuestionCircleOutlined, 
+  MailOutlined,
+  SettingOutlined,
+  LogoutOutlined,
+  DashboardOutlined,
+  ProfileOutlined
+} from '@ant-design/icons';
+import { 
+  Avatar, 
+  Flex, 
+  Dropdown, 
+  Card, 
+  Button, 
+  Badge, 
+  List, 
+  Modal, 
+  Divider, 
+  Typography, 
+  Space, 
+  Tooltip,
+  Switch 
+} from 'antd';
 import React, { useEffect, useState } from 'react';
 import comunikcrm from '../assets/comunikcrm.png';
 import { useNavigate } from 'react-router-dom';
 import { useStateContext } from '../contexts/ContextProvider';
 import axios from '../axios';
 
-const CostumHeader = () => {
-  const { setToken, theme, setTheme } = useStateContext();
+const { Title, Text } = Typography;
+
+const CustomHeader = () => {
+  const { user, token, setToken, theme, setTheme, logout } = useStateContext();
   const navigate = useNavigate();
-  const [user, setUser] = useState({});
   const [eventNotifications, setEventNotifications] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [popupEvent, setPopupEvent] = useState(null);
   const [popupVisible, setPopupVisible] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+
+  const themeConfig = {
+    light: {
+      headerBg: '#ffffff',
+      textPrimary: '#000000',
+      textSecondary: '#595959',
+      cardBg: '#ffffff',
+      border: '#f0f0f0',
+      primary: '#1890ff',
+      avatarBg: '#f0f9ff',
+      hoverBg: '#f5f5f5',
+    },
+    dark: {
+      headerBg: '#141414',
+      textPrimary: 'rgba(255, 255, 255, 0.85)',
+      textSecondary: 'rgba(255, 255, 255, 0.45)',
+      cardBg: '#1f1f1f',
+      border: '#303030',
+      primary: '#177ddc',
+      avatarBg: '#111b26',
+      hoverBg: '#1d1d1d',
+    }
+  };
+
+  const currentTheme = themeConfig[theme];
 
   useEffect(() => {
-    let intervalId;
-
-    const fetchUser = async () => {
-      try {
-        const token = localStorage.getItem('ACCESS_TOKEN');
-        if (!token) {
-          console.error('No access token found');
-          return;
-        }
-
-        const response = await axios.get('http://127.0.0.1:8000/api/employees', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const currentUser = response.data.find(emp => emp.id === parseInt(localStorage.getItem('USER_ID')));
-        if (currentUser) {
-          const { id, name, email, phone_number, address, sos_number, social_situation, department } = currentUser;
-          setUser({
-            id,
-            name,
-            email,
-            phone: phone_number || 'Phone not provided',
-            address: address || 'Address not provided',
-            sosNumber: sos_number || 'SOS Number not provided',
-            socialSituation: social_situation || 'Social Situation not provided',
-            department: department || 'Department not provided',
-          });
-        } else {
-          console.error('Current user not found in employees list');
-        }
-      } catch (error) {
-        console.error('Error fetching user information:', error);
-      }
-    };
-
     const fetchEvents = async () => {
       try {
         const response = await axios.get('http://127.0.0.1:8000/api/events');
-        const events = response.data;
-        setEventNotifications(events);
-
-        let shownEventIds = JSON.parse(localStorage.getItem('SHOWN_EVENT_IDS') || '[]');
-        let shownEndedIds = JSON.parse(localStorage.getItem('SHOWN_ENDED_EVENT_IDS') || '[]');
-        const now = new Date();
-        const notifShownOnLogin = sessionStorage.getItem('NOTIF_SHOWN_ON_LOGIN');
-
-        const newEvents = events.filter(e => !shownEventIds.includes(e.id));
-        const newlyEnded = events.filter(e => e.end_date && new Date(e.end_date) < now && !shownEndedIds.includes(e.id));
-
-        // Only show popup if NOTIF_SHOWN_ON_LOGIN is not set (first load in session)
-        if (!notifShownOnLogin && (newEvents.length > 0 || newlyEnded.length > 0)) {
-          let popup = null;
-          if (newEvents.length > 0) {
-            popup = {
-              type: 'new',
-              event: newEvents[0],
-              count: newEvents.length
-            };
-          } else if (newlyEnded.length > 0) {
-            popup = {
-              type: 'ended',
-              event: newlyEnded[0],
-              count: newlyEnded.length
-            };
-          }
-          if (popup) {
-            notification.destroy();
-            notification.open({
-              key: `${popup.type}-${popup.event.id}-${popup.event.start_date}`,
-              message: popup.type === 'new'
-                ? (popup.count > 1 ? `Nouvel événement (+${popup.count - 1} more)` : 'Nouvel événement')
-                : (popup.count > 1 ? `Event Ended (+${popup.count - 1} more)` : 'Event Ended'),
-              description: popup.type === 'new'
-                ? `${popup.event.title} - ${popup.event.start_date}`
-                : `The event "${popup.event.title}" has ended.`,
-              duration: 4,
-            });
-            sessionStorage.setItem('NOTIF_SHOWN_ON_LOGIN', '1');
-            console.log('[Notification Popup] Popup shown and sessionStorage NOTIF_SHOWN_ON_LOGIN set to 1');
-          }
-        } else {
-          console.log('[Notification Popup] Popup not shown. sessionStorage NOTIF_SHOWN_ON_LOGIN:', notifShownOnLogin);
-        }
-        // Always update shown IDs in localStorage
-        if (newEvents.length > 0) {
-          shownEventIds = [...shownEventIds, ...newEvents.map(e => e.id)];
-          localStorage.setItem('SHOWN_EVENT_IDS', JSON.stringify(shownEventIds));
-        }
-        if (newlyEnded.length > 0) {
-          shownEndedIds = [...shownEndedIds, ...newlyEnded.map(e => e.id)];
-          localStorage.setItem('SHOWN_ENDED_EVENT_IDS', JSON.stringify(shownEndedIds));
-        }
+        setEventNotifications(response.data.slice(0, 5));
       } catch (error) {
         console.error('Error fetching events:', error);
       } finally {
@@ -119,207 +79,450 @@ const CostumHeader = () => {
       }
     };
 
-    fetchUser();
-    fetchEvents();
-    intervalId = setInterval(fetchEvents, 5000);
-    return () => clearInterval(intervalId);
-  }, []);
+    if (token) {
+      fetchEvents();
+    }
+  }, [token]);
 
-  // Reset NOTIF_SHOWN_ON_LOGIN on login/logout
-  useEffect(() => {
-    // Only reset the flag on logout, not on every mount
-    // sessionStorage.removeItem('NOTIF_SHOWN_ON_LOGIN');
-  }, []);
-
-  console.log('User Data:', user); // Debugging: Log the user data to verify if it is being fetched correctly
-
-  const handleLogout = () => {
-    setToken(null);
-    localStorage.removeItem('ACCESS_TOKEN');
-    sessionStorage.removeItem('NOTIF_SHOWN_ON_LOGIN');
-    console.log('[Notification Popup] sessionStorage NOTIF_SHOWN_ON_LOGIN cleared on logout');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
-  const handleNotificationClick = (event) => {
-    setPopupEvent(event);
-    setPopupVisible(true);
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
   };
 
-  const handleThemeChange = (newTheme) => {
-    setTheme(newTheme);
-    setIsModalOpen(false);
-  };
+  const UserMenu = () => (
+    <Card 
+      style={{ 
+        width: 280,
+        padding: 0,
+        borderRadius: 8,
+        backgroundColor: currentTheme.cardBg,
+        borderColor: currentTheme.border,
+        boxShadow: '0 3px 10px rgba(0, 0, 0, 0.16)'
+      }}
+    >
+      <Flex vertical gap={16} style={{ padding: 24 }}>
+        <Flex align="center" gap={16}>
+          <Avatar 
+            size={64} 
+            src={user?.avatar}
+            icon={<UserOutlined />}
+            style={{ 
+              backgroundColor: currentTheme.primary,
+              color: '#fff',
+              fontSize: 24,
+            }}
+          >
+            {user?.name?.charAt(0).toUpperCase() || 'U'}
+          </Avatar>
+          <Flex vertical>
+            <Title level={5} style={{ margin: 0, color: currentTheme.textPrimary }}>
+              {user?.name || 'User Name'}
+            </Title>
+            <Text type="secondary" style={{ color: currentTheme.textSecondary }}>
+              {user?.role?.name || 'Employee'}
+            </Text>
+          </Flex>
+        </Flex>
 
-  const menu = (
-    <Card style={{ padding: '20px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', marginBottom: '20px' }}> {/* Added box styling */}
-      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <Avatar size={64} style={{ backgroundColor: '#1890ff', fontSize: '24px' }}>
-          {user.name ? user.name.charAt(0).toUpperCase() : '?'}
-        </Avatar>
-        <Typography.Title level={5} style={{ margin: '10px 0' }}>{user.name || 'User Name'}</Typography.Title>
-        <Typography.Text type="secondary">{user.email || 'user@example.com'}</Typography.Text>
-      </div>
-      <div style={{ borderTop: '1px solid #f0f0f0', margin: '20px 0' }}></div> {/* Added line between sections */}
-      <Button type="link" block onClick={() => navigate('/profile')} style={{ textAlign: 'left', marginBottom: '10px' }}>
-        Manage your Profile
-      </Button>
-      <Button type="link" block onClick={() => navigate('/settings')} style={{ textAlign: 'left', marginBottom: '10px' }}>
-        Settings
-      </Button>
-      <div style={{ borderTop: '1px solid #f0f0f0', margin: '20px 0' }}></div> {/* Added line before logout */}
-      <Button type="link" block onClick={handleLogout} style={{ textAlign: 'left', color: 'red' }}>
-        Sign out
-      </Button>
+        <Divider style={{ margin: 0, borderColor: currentTheme.border }} />
+
+        <Flex vertical gap={4}>
+          <Button 
+            type="text" 
+            icon={<DashboardOutlined />}
+            block 
+            style={{ 
+              textAlign: 'left',
+              height: 40,
+              color: currentTheme.textPrimary,
+            }}
+            onClick={() => navigate('/dashboard')}
+          >
+            Dashboard
+          </Button>
+
+          <Button 
+            type="text" 
+            icon={<ProfileOutlined />}
+            block 
+            style={{ 
+              textAlign: 'left',
+              height: 40,
+              color: currentTheme.textPrimary,
+            }}
+            onClick={() => navigate('/profile')}
+          >
+            My Profile
+          </Button>
+
+          <Button 
+            type="text" 
+            icon={<SettingOutlined />}
+            block 
+            style={{ 
+              textAlign: 'left',
+              height: 40,
+              color: currentTheme.textPrimary,
+            }}
+            onClick={() => navigate('/settings')}
+          >
+            Settings
+          </Button>
+        </Flex>
+
+        <Divider style={{ margin: 0, borderColor: currentTheme.border }} />
+
+        <Button 
+          type="text" 
+          icon={<LogoutOutlined />}
+          block 
+          danger
+          style={{ height: 40, textAlign: 'left' }}
+          onClick={handleLogout}
+        >
+          Sign Out
+        </Button>
+      </Flex>
     </Card>
   );
 
-  const notificationMenu = (
-    <Card style={{ width: 260, borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', maxHeight: 420, padding: 0, overflowY: 'auto', background: '#f9fbff' }}>
-      <Typography.Title level={5} style={{ margin: '12px 0 8px 16px', color: '#277dfe', fontWeight: 700, fontSize: 16 }}>Notifications</Typography.Title>
+  const NotificationMenu = () => (
+    <Card
+      style={{
+        width: 360,
+        borderRadius: 8,
+        backgroundColor: currentTheme.cardBg,
+        borderColor: currentTheme.border,
+        boxShadow: '0 3px 10px rgba(0, 0, 0, 0.16)',
+        padding: 0
+      }}
+    >
+      <Flex justify="space-between" align="center" style={{ 
+        padding: '16px', 
+        borderBottom: `1px solid ${currentTheme.border}` 
+      }}>
+        <Text strong style={{ color: currentTheme.textPrimary, fontSize: 16 }}>
+          Notifications
+        </Text>
+        <Badge count={eventNotifications.length} size="small" />
+      </Flex>
+
       {loadingEvents ? (
-        <div style={{ textAlign: 'center', padding: '20px' }}>Loading...</div>
+        <Flex justify="center" style={{ padding: 24 }}>
+          <Text type="secondary">Loading notifications...</Text>
+        </Flex>
+      ) : eventNotifications.length === 0 ? (
+        <Flex justify="center" style={{ padding: 24 }}>
+          <Text type="secondary">No new notifications</Text>
+        </Flex>
       ) : (
         <List
           itemLayout="horizontal"
-          dataSource={[...eventNotifications].sort((a, b) => new Date(b.start_date) - new Date(a.start_date))}
+          dataSource={eventNotifications}
+          style={{ maxHeight: 400, overflowY: 'auto' }}
           renderItem={(item) => (
-            <List.Item style={{ padding: '8px 0', borderBottom: '1px solid #f0f0f0', cursor: 'pointer' }} onClick={() => handleNotificationClick(item)}>
+            <List.Item
+              style={{
+                padding: '12px 16px',
+                borderBottom: `1px solid ${currentTheme.border}`,
+                cursor: 'pointer',
+                transition: 'background 0.3s',
+                ':hover': {
+                  backgroundColor: currentTheme.hoverBg
+                }
+              }}
+              onClick={() => {
+                setPopupEvent(item);
+                setPopupVisible(true);
+              }}
+            >
               <List.Item.Meta
-                avatar={<Avatar size={32} style={{ background: '#277dfe', fontWeight: 600 }}>{item.title ? item.title.charAt(0) : '?'}</Avatar>}
-                title={<span style={{ fontWeight: 600, fontSize: 14, color: '#222' }}>{item.title}</span>}
+                avatar={
+                  <Badge dot color={item.status === 'urgent' ? 'red' : 'blue'}>
+                    <Avatar 
+                      size={40} 
+                      style={{ 
+                        backgroundColor: currentTheme.avatarBg,
+                        color: currentTheme.primary
+                      }}
+                    >
+                      {item.title?.charAt(0) || '!'}
+                    </Avatar>
+                  </Badge>
+                }
+                title={
+                  <Flex justify="space-between">
+                    <Text strong style={{ color: currentTheme.textPrimary }}>
+                      {item.title || 'Notification'}
+                    </Text>
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      {new Date(item.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </Text>
+                  </Flex>
+                }
                 description={
-                  <div>
-                    {item.start_date && <div style={{ fontSize: 12, color: '#888' }}>Date: {item.start_date}</div>}
-                    {item.users && item.users.length > 0 && (
-                      <div style={{ marginTop: 4 }}>
-                        <span style={{ fontWeight: 500, fontSize: 12, color: '#555' }}>Assigned:</span>
-                        <div style={{ display: 'flex', gap: 4, marginTop: 2, flexWrap: 'wrap' }}>
-                          {item.users.map(user => (
-                            <span key={user.id} style={{ display: 'flex', alignItems: 'center', marginRight: 6 }}>
-                              <Avatar size={18} src={user.avatar} style={{ marginRight: 2, background: '#e6f0ff', color: '#277dfe', fontSize: 11 }}>
-                                {user.name ? user.name.charAt(0) : '?'}
-                              </Avatar>
-                              <span style={{ fontSize: 11, color: '#555' }}>{user.name}</span>
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  <Text 
+                    style={{ 
+                      color: currentTheme.textSecondary,
+                      fontSize: 13,
+                    }}
+                    ellipsis={{ rows: 2 }}
+                  >
+                    {item.description || 'No description provided'}
+                  </Text>
                 }
               />
             </List.Item>
           )}
         />
       )}
-      <div style={{ textAlign: 'center', margin: '8px 0 4px 0' }}>
-        <a href="#" style={{ color: '#277dfe', fontSize: 13 }}>See all recent activity</a>
-      </div>
     </Card>
   );
 
   return (
     <>
-      <Flex align='center' style={{ 
-        backgroundColor: '#fff', 
-        padding: '5px 15px', 
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', 
-        borderBottom: '1px solid #e6f0ff', 
-        height: '60px', 
-        alignItems: 'center' 
-      }}> 
-        <Typography.Title level={4} style={{ margin: 0, color: '#000', fontSize: '18px' }}>
-          <img src={comunikcrm} width="100" alt="Logo" style={{ marginRight: '10px', verticalAlign: 'middle' }} />
-         
-        </Typography.Title>
-        <Flex align='center' gap='1.5rem' style={{ marginLeft: 'auto' }}>
-          <Dropdown 
-            dropdownRender={() => notificationMenu}
-            placement="bottomRight" 
-            trigger={['click']}
-          >
-            <Badge count={eventNotifications.length} offset={[10, 0]}>
-              <Avatar size={36} icon={<BellOutlined />} style={{ backgroundColor: '#fff', color: '#277dfe', cursor: 'pointer' }} />
-            </Badge>
-          </Dropdown>
-          <Dropdown 
-            dropdownRender={() => menu}
-            placement="bottomRight" 
-            trigger={['click']}
-          >
-            <Avatar size={36} icon={<UserOutlined />} style={{ backgroundColor: '#fff', color: '#277dfe', cursor: 'pointer' }} />
-          </Dropdown>
-          <Button
-            type="text"
-            icon={<BgColorsOutlined />}
-            onClick={() => setIsModalOpen(true)}
-            style={{ fontSize: 16, color: '#000' }}
-            aria-label="Switch theme"
+      <Flex
+        align="center"
+        style={{
+          height: 64,
+          padding: '0 24px',
+          backgroundColor: currentTheme.headerBg,
+          borderBottom: `1px solid ${currentTheme.border}`,
+          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100
+        }}
+      >
+        {/* Left Section - Logo */}
+        <Flex align="center">
+          <img 
+            src={comunikcrm} 
+            alt="Company Logo" 
+            style={{ 
+              height: 32,
+              marginRight: 12,
+              filter: theme === 'dark' ? 'brightness(0) invert(1)' : 'none'
+            }} 
           />
         </Flex>
+
+        {/* Right Section - Actions */}
+        <Flex align="center" gap={16} style={{ marginLeft: 'auto' }}>
+          <Tooltip title="Help Center">
+            <Button
+              type="text"
+              icon={<QuestionCircleOutlined />}
+              onClick={() => setIsHelpModalOpen(true)}
+              style={{
+                color: currentTheme.textPrimary,
+                fontSize: 18,
+                width: 40,
+                height: 40
+              }}
+            />
+          </Tooltip>
+
+          <Tooltip title="Messages">
+            <Badge count={5} size="small">
+              <Button
+                type="text"
+                icon={<MailOutlined />}
+                onClick={() => navigate('/messages')}
+                style={{
+                  color: currentTheme.textPrimary,
+                  fontSize: 18,
+                  width: 40,
+                  height: 40
+                }}
+              />
+            </Badge>
+          </Tooltip>
+
+          <Dropdown
+            overlay={<NotificationMenu />}
+            trigger={['click']}
+            placement="bottomRight"
+            overlayStyle={{ zIndex: 1050 }}
+          >
+            <Badge count={eventNotifications.length} size="small">
+              <Button
+                type="text"
+                icon={<BellOutlined />}
+                style={{
+                  color: currentTheme.textPrimary,
+                  fontSize: 18,
+                  width: 40,
+                  height: 40
+                }}
+              />
+            </Badge>
+          </Dropdown>
+
+          <Tooltip title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+            <Switch
+              checked={theme === 'dark'}
+              onChange={toggleTheme}
+              checkedChildren={<MoonOutlined />}
+              unCheckedChildren={<SunOutlined />}
+              style={{
+                backgroundColor: theme === 'dark' ? currentTheme.primary : '#d9d9d9'
+              }}
+            />
+          </Tooltip>
+
+          <Dropdown
+            overlay={<UserMenu />}
+            trigger={['click']}
+            placement="bottomRight"
+            overlayStyle={{ zIndex: 1050 }}
+          >
+            <Avatar
+              size={36}
+              src={user?.avatar}
+              icon={<UserOutlined />}
+              style={{
+                backgroundColor: currentTheme.avatarBg,
+                color: currentTheme.primary,
+                cursor: 'pointer',
+                border: `2px solid ${currentTheme.primary}`
+              }}
+            />
+          </Dropdown>
+        </Flex>
       </Flex>
+
+      {/* Help Modal */}
       <Modal
-        title="Choose Theme"
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        title="Help Center"
+        open={isHelpModalOpen}
+        onCancel={() => setIsHelpModalOpen(false)}
         footer={null}
-        centered
+        width={600}
+        bodyStyle={{ 
+          padding: 24,
+          backgroundColor: currentTheme.cardBg,
+        }}
       >
-        <Flex gap="1rem" justify="center">
-          <Button
-            type={theme === 'light' ? 'primary' : 'default'}
-            onClick={() => handleThemeChange('light')}
-          >
-            Light
-          </Button>
-          <Button
-            type={theme === 'dark' ? 'primary' : 'default'}
-            onClick={() => handleThemeChange('dark')}
-          >
-            Dark
-          </Button>
+        <Flex vertical gap={24}>
+          <Flex vertical gap={8}>
+            <Text strong style={{ color: currentTheme.textPrimary }}>
+              Need help with something?
+            </Text>
+            <Text style={{ color: currentTheme.textSecondary }}>
+              Browse our documentation or contact our support team for assistance.
+            </Text>
+          </Flex>
+
+          <Divider style={{ margin: 0, borderColor: currentTheme.border }} />
+
+          <Flex vertical gap={16}>
+            <Button 
+              type="primary" 
+              block
+              onClick={() => window.open('https://help.comunikcrm.com/docs', '_blank')}
+            >
+              View Documentation
+            </Button>
+            <Button 
+              block
+              onClick={() => window.open('mailto:support@comunikcrm.com')}
+            >
+              Contact Support
+            </Button>
+          </Flex>
         </Flex>
       </Modal>
+
+      {/* Notification Detail Modal */}
       <Modal
-        title={popupEvent ? popupEvent.title : ''}
+        title={popupEvent?.title || 'Notification Details'}
         open={popupVisible}
         onCancel={() => setPopupVisible(false)}
         footer={null}
-        styles={{ body: { borderRadius: 10, background: '#f9fbff', padding: 24 } }}
-        style={{ top: 60 }}
+        width={600}
+        bodyStyle={{ 
+          padding: 24,
+          backgroundColor: currentTheme.cardBg,
+        }}
       >
         {popupEvent && (
-          <div style={{ minWidth: 320 }}>
-            <div style={{ marginBottom: 12 }}>
-              <span style={{ fontWeight: 600, color: '#277dfe', fontSize: 15 }}>Date:</span>
-              <span style={{ marginLeft: 8, color: '#333', fontSize: 14 }}>{popupEvent.start_date}</span>
-            </div>
-            <div style={{ marginBottom: 12 }}>
-              <span style={{ fontWeight: 600, color: '#277dfe', fontSize: 15 }}>Description:</span>
-              <span style={{ marginLeft: 8, color: '#333', fontSize: 14 }}>{popupEvent.description}</span>
-            </div>
-            <Divider style={{ margin: '16px 0' }} />
-            <div style={{ marginBottom: 8, fontWeight: 600, color: '#277dfe', fontSize: 15 }}>Users Assigned:</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-              {(popupEvent.users && popupEvent.users.length > 0 ? popupEvent.users : popupEvent.participants && popupEvent.participants.length > 0 ? popupEvent.participants : []).length > 0 ? (
-                (popupEvent.users && popupEvent.users.length > 0 ? popupEvent.users : popupEvent.participants).map(user => (
-                  <div key={user.id} style={{ display: 'flex', alignItems: 'center', background: '#e6f0ff', borderRadius: 6, padding: '4px 10px', marginBottom: 4 }}>
-                    <Avatar size={28} src={user.avatar} style={{ marginRight: 8, background: '#fff', color: '#277dfe', fontWeight: 600 }}>
-                      {user.name ? user.name.charAt(0) : '?'}
-                    </Avatar>
-                    <span style={{ fontSize: 13, color: '#222', fontWeight: 500 }}>{user.name}</span>
-                  </div>
-                ))
+          <Flex vertical gap={16}>
+            <Flex justify="space-between">
+              <Text strong style={{ color: currentTheme.textPrimary }}>
+                Date & Time:
+              </Text>
+              <Text style={{ color: currentTheme.textSecondary }}>
+                {new Date(popupEvent.start_date).toLocaleString()}
+              </Text>
+            </Flex>
+
+            {popupEvent.description && (
+              <Flex vertical gap={8}>
+                <Text strong style={{ color: currentTheme.textPrimary }}>
+                  Details:
+                </Text>
+                <Text style={{ color: currentTheme.textSecondary }}>
+                  {popupEvent.description}
+                </Text>
+              </Flex>
+            )}
+
+            <Divider style={{ borderColor: currentTheme.border }} />
+
+            <Flex vertical gap={8}>
+              <Text strong style={{ color: currentTheme.textPrimary }}>
+                Participants:
+              </Text>
+              {popupEvent.users?.length > 0 ? (
+                <Flex gap={8} wrap="wrap">
+                  {popupEvent.users.map(user => (
+                    <Flex 
+                      key={user.id} 
+                      align="center"
+                      style={{
+                        padding: '4px 12px',
+                        backgroundColor: currentTheme.avatarBg,
+                        borderRadius: 20,
+                        border: `1px solid ${currentTheme.border}`
+                      }}
+                    >
+                      <Avatar 
+                        size={24} 
+                        src={user.avatar}
+                        style={{ 
+                          marginRight: 8,
+                          backgroundColor: currentTheme.primary,
+                          color: '#fff'
+                        }}
+                      >
+                        {user.name?.charAt(0)}
+                      </Avatar>
+                      <Text style={{ color: currentTheme.textPrimary, fontSize: 12 }}>
+                        {user.name}
+                      </Text>
+                    </Flex>
+                  ))}
+                </Flex>
               ) : (
-                <span style={{ fontSize: 13, color: '#aaa' }}>No users assigned</span>
+                <Text style={{ color: currentTheme.textSecondary }}>
+                  No participants assigned
+                </Text>
               )}
-            </div>
-          </div>
+            </Flex>
+          </Flex>
         )}
       </Modal>
     </>
   );
 };
 
-export default CostumHeader;
+export default CustomHeader;

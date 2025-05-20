@@ -1,189 +1,310 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Divider, Form, Input, Select, DatePicker, message } from 'antd';
+import { Button, Divider, Form, Input, Select, DatePicker, message, ConfigProvider } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
-
+import { useStateContext } from '../contexts/ContextProvider';
+import { useNavigate } from 'react-router-dom';
 const { Option } = Select;
 
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 8 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 16 },
-  },
-};
-
-const DayOffRequestForm = () => {
+const DayOffRequestForm = ({ onSuccess }) => {
+const { theme, token: contextToken, user } = useStateContext(); // Get user from context
+  const navigate = useNavigate(); // Initialize navigate
   const [hasPendingVacation, setHasPendingVacation] = useState(false);
   const [startDate, setStartDate] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm();
+
+  // Theme configuration
+  const themeStyles = {
+    light: {
+      containerBg: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      formBg: 'rgba(255,255,255,0.95)',
+      textColor: '#2d3a4b',
+      borderColor: '#d9d9d9',
+      cardShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
+      formShadow: '0 2px 8px rgba(0,0,0,0.07)',
+      dividerColor: '#f0f0f0',
+    },
+    dark: {
+      containerBg: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+      formBg: 'rgba(30, 30, 46, 0.95)',
+      textColor: 'rgba(255, 255, 255, 0.85)',
+      borderColor: '#434343',
+      cardShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
+      formShadow: '0 2px 8px rgba(0,0,0,0.2)',
+      dividerColor: '#303030',
+    }
+  };
+
+  const currentTheme = themeStyles[theme];
+
+
+   const verifyAuthentication = () => {
+    // Use token from context first, fallback to localStorage
+    const token = contextToken || localStorage.getItem('ACCESS_TOKEN');
+    const userId = user?.id || localStorage.getItem('USER_ID');
+    
+    if (!token) {
+      console.error('Authentication error: No token found');
+      message.error('Please login to access this feature');
+      navigate('/login');
+      return false;
+    }
+    
+    if (!userId) {
+      console.error('Authentication error: No user ID found');
+      message.error('User session incomplete');
+      navigate('/login');
+      return false;
+    }
+    
+    return { token, userId };
+  };
 
   useEffect(() => {
     const fetchPendingVacation = async () => {
+      const auth = verifyAuthentication();
+      if (!auth) return;
+
       try {
-        const token = localStorage.getItem('ACCESS_TOKEN');
-
-        if (!token) {
-          message.error('User is not authenticated');
-          return;
-        }
-
-        const response = await axios.get('http://127.0.0.1:8000/api/vacations', {
+        const response = await axios.post('http://127.0.0.1:8000/api/vacations', {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${auth.token}`,
           },
+          params: {
+            user_id: auth.userId,
+            status: 'pending'
+          }
         });
 
-        const pendingVacation = response.data.find(vacation => vacation.status === 'pending');
-        if (pendingVacation) {
-          setHasPendingVacation(true);
-        }
+        setHasPendingVacation(response.data.length > 0);
       } catch (error) {
-        console.error('Failed to fetch vacations', error);
+        console.error('API Error:', {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status
+        });
+        
+        if (error.response?.status === 401) {
+          message.error('Session expired. Please login again.');
+          navigate('/login');
+        } else {
+          message.error(error.response?.data?.message || 'Failed to check pending vacations');
+        }
       }
     };
 
     fetchPendingVacation();
-  }, []);
+  }, [navigate, contextToken, user]); // Add dependencies
 
   const onFinish = async (values) => {
+    const auth = verifyAuthentication();
+    if (!auth) return;
+    
     if (hasPendingVacation) {
-      message.error('You already have a pending vacation request. Please wait until it is approved or rejected.');
+      message.error('You already have a pending vacation request.');
       return;
     }
 
     try {
-      const token = localStorage.getItem('ACCESS_TOKEN');
-
-      if (!token) {
-        message.error('User is not authenticated');
-        return;
-      }
-
+      setLoading(true);
+      
       const response = await axios.post('http://127.0.0.1:8000/api/vacations', {
         type: values.dayOffType,
         start_date: values.startDate.format('YYYY-MM-DD'),
         end_date: values.endDate.format('YYYY-MM-DD'),
         reason: values.reason,
         status: 'pending',
+        user_id: auth.userId
       }, {
         headers: {
-          Authorization: `Bearer ${token}`,
-        },
+          Authorization: `Bearer ${auth.token}`,
+          'Content-Type': 'application/json'
+        }
       });
 
-      console.log('Day off request successful', response.data);
-
-      message.success('Day off request submitted successfully');
+      message.success('Request submitted successfully');
       setHasPendingVacation(true);
+      form.resetFields();
+      onSuccess?.();
     } catch (error) {
-      console.error('Day off request failed', error);
-
-      if (error.response && error.response.data && error.response.data.errors) {
-        message.error(`Error: ${JSON.stringify(error.response.data.errors)}`);
+      console.error('Submission Error:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      if (error.response?.status === 401) {
+        message.error('Session expired. Please login again.');
+        navigate('/login');
       } else {
-        message.error('You already have a pending vacation request. Please wait until it is approved or rejected.');
+        message.error(error.response?.data?.message || 'Submission failed. Please try again.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   const disabledStartDate = (current) => {
-    // Can not select days before today
     return current && current < dayjs().startOf('day');
   };
 
   const disabledEndDate = (current) => {
-    // Can not select days before the start date
+    if (!startDate) return current && current < dayjs().startOf('day');
     return current && current < dayjs(startDate).startOf('day');
   };
 
+  const formItemLayout = {
+    labelCol: {
+      xs: { span: 24 },
+      sm: { span: 8 },
+    },
+    wrapperCol: {
+      xs: { span: 24 },
+      sm: { span: 16 },
+    },
+  };
+
   return (
-    <div style={{
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-      borderRadius: '16px',
-      boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
-      padding: '32px 24px',
-      margin: '24px auto',
-      maxWidth: 600,
-      minWidth: 320,
-      minHeight: 480,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}> 
-      <h2 style={{
-        textAlign: 'center',
-        fontWeight: 700,
-        fontSize: '2rem',
-        color: '#2d3a4b',
-        marginBottom: 8,
-        letterSpacing: 1,
-      }}>
-        Demande de congé
-      </h2>
-      <Divider style={{ margin: '12px 0 24px 0' }} />
-      <Form {...formItemLayout} onFinish={onFinish} style={{ width: '100%', background: 'rgba(255,255,255,0.95)', borderRadius: '12px', padding: '24px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}>
-        <Form.Item
-          label="Type Congé"
-          name="dayOffType"
-          rules={[{ required: true, message: 'Please select type of day off' }]}
-          labelCol={{ xs: { span: 24 }, sm: { span: 8 } }}
-          wrapperCol={{ xs: { span: 24 }, sm: { span: 16 } }}
+    <ConfigProvider
+      theme={{
+        token: {
+          colorBgContainer: currentTheme.formBg,
+          colorBorder: currentTheme.borderColor,
+          colorText: currentTheme.textColor,
+          colorTextHeading: currentTheme.textColor,
+          colorTextLabel: currentTheme.textColor,
+          colorPrimary: theme === 'dark' ? '#177ddc' : '#1890ff',
+        },
+      }}
+    >
+      <div style={{
+        background: currentTheme.containerBg,
+        borderRadius: '16px',
+        boxShadow: currentTheme.cardShadow,
+        padding: '32px 24px',
+        margin: '24px auto',
+        maxWidth: 600,
+        minWidth: 320,
+        minHeight: 480,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}> 
+        <h2 style={{
+          textAlign: 'center',
+          fontWeight: 700,
+          fontSize: '2rem',
+          color: currentTheme.textColor,
+          marginBottom: 8,
+          letterSpacing: 1,
+        }}>
+          Demande de congé
+        </h2>
+        <Divider style={{ 
+          margin: '12px 0 24px 0',
+          borderColor: currentTheme.dividerColor 
+        }} />
+        <Form 
+          {...formItemLayout} 
+          form={form}
+          onFinish={onFinish} 
+          style={{ 
+            width: '100%', 
+            background: currentTheme.formBg, 
+            borderRadius: '12px', 
+            padding: '24px 16px', 
+            boxShadow: currentTheme.formShadow 
+          }}
         >
-          <Select size="large" placeholder="Sélectionner le type de congé">
-            <Option value="Sick">Maladie</Option>
-            <Option value="Vacation">Voyage</Option>
-            <Option value="Personal">Personel</Option>
-          </Select>
-        </Form.Item>
-        <Form.Item
-          label="Date début"
-          name="startDate"
-          rules={[{ required: true, message: 'Please select start date' }]}
-          labelCol={{ xs: { span: 24 }, sm: { span: 8 } }}
-          wrapperCol={{ xs: { span: 24 }, sm: { span: 16 } }}
-        >
-          <DatePicker 
-            style={{ width: '100%' }} 
-            size="large" 
-            disabledDate={disabledStartDate}
-            onChange={(date) => setStartDate(date)} 
-            placeholder="Choisir la date de début"
-          />
-        </Form.Item>
-        <Form.Item
-          label="Date fin"
-          name="endDate"
-          rules={[{ required: true, message: 'Please select end date' }]}
-          labelCol={{ xs: { span: 24 }, sm: { span: 8 } }}
-          wrapperCol={{ xs: { span: 24 }, sm: { span: 16 } }}
-        >
-          <DatePicker 
-            style={{ width: '100%' }} 
-            size="large" 
-            disabledDate={disabledEndDate} 
-            placeholder="Choisir la date de fin"
-          />
-        </Form.Item>
-        <Form.Item
-          label="Raison"
-          name="reason"
-          rules={[{ required: true, message: 'Please provide reason for day off' }]}
-          labelCol={{ xs: { span: 24 }, sm: { span: 8 } }}
-          wrapperCol={{ xs: { span: 24 }, sm: { span: 16 } }}
-        >
-          <Input.TextArea size="large" placeholder="Décrivez la raison de votre congé" autoSize={{ minRows: 3, maxRows: 6 }} />
-        </Form.Item>
-        <Form.Item style={{ textAlign: 'center', marginTop: 24 }}>
-          <Button type="primary" htmlType="submit" disabled={hasPendingVacation} style={{ width: '100%', maxWidth: '220px', fontWeight: 600, fontSize: '1.1rem', height: 48, borderRadius: 8 }}>
-            Envoyer
-          </Button>
-        </Form.Item>
-      </Form>
-    </div>
+          <Form.Item
+            label="Type Congé"
+            name="dayOffType"
+            rules={[{ required: true, message: 'Please select type of day off' }]}
+          >
+            <Select 
+              size="large" 
+              placeholder="Sélectionner le type de congé"
+            >
+              <Option value="Sick">Maladie</Option>
+              <Option value="Vacation">Voyage</Option>
+              <Option value="Personal">Personel</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="Date début"
+            name="startDate"
+            rules={[{ required: true, message: 'Please select start date' }]}
+          >
+            <DatePicker 
+              style={{ width: '100%' }} 
+              size="large" 
+              disabledDate={disabledStartDate}
+              onChange={(date) => setStartDate(date)} 
+              placeholder="Choisir la date de début"
+            />
+          </Form.Item>
+          <Form.Item
+            label="Date fin"
+            name="endDate"
+            rules={[
+              { required: true, message: 'Please select end date' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || !getFieldValue('startDate') || 
+                      dayjs(value).isAfter(getFieldValue('startDate')) || 
+                      dayjs(value).isSame(getFieldValue('startDate'))) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('End date must be after start date'));
+                },
+              }),
+            ]}
+          >
+            <DatePicker 
+              style={{ width: '100%' }} 
+              size="large" 
+              disabledDate={disabledEndDate} 
+              placeholder="Choisir la date de fin"
+            />
+          </Form.Item>
+          <Form.Item
+            label="Raison"
+            name="reason"
+            rules={[
+              { required: true, message: 'Please provide reason for day off' },
+              { min: 10, message: 'Reason must be at least 10 characters' }
+            ]}
+          >
+            <Input.TextArea 
+              size="large" 
+              placeholder="Décrivez la raison de votre congé" 
+              autoSize={{ minRows: 3, maxRows: 6 }} 
+            />
+          </Form.Item>
+          <Form.Item style={{ textAlign: 'center', marginTop: 24 }}>
+            <Button 
+              type="primary" 
+              htmlType="submit" 
+              disabled={hasPendingVacation} 
+              loading={loading}
+              size="large"
+              style={{ 
+                width: '100%', 
+                maxWidth: '220px', 
+                fontWeight: 600, 
+                fontSize: '1.1rem', 
+                height: 48, 
+                borderRadius: 8 
+              }}
+            >
+              {hasPendingVacation ? 'Request Pending' : 'Envoyer'}
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    </ConfigProvider>
   );
 };
 

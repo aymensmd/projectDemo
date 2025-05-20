@@ -1,19 +1,46 @@
-import { Button, Card, Drawer, Typography, Space, message, Flex } from 'antd';
+import { Button, Card, Drawer, Typography, Flex, message } from 'antd';
 import React, { useState, useEffect } from 'react';
 import CongeForm from '../Form/CongeForm';
 import VacData from '../data/VacData';
 import axios from 'axios';
+import { useStateContext } from '../contexts/ContextProvider';
+
+const { Title, Text } = Typography;
 
 const Banner = ({ userId }) => {
+  const { theme } = useStateContext();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [secondDrawerVisible, setSecondDrawerVisible] = useState(false);
   const [vacationDays, setVacationDays] = useState(0);
 
+  // Theme configuration
+  const themeColors = {
+    light: {
+      cardBg: '#ffffff',
+      textPrimary: '#000000',
+      textSecondary: '#595959',
+      primary: '#1890ff',
+      secondaryBg: '#f0f5ff',
+      border: '#d9d9d9',
+      buttonBg: '#fafafa',
+    },
+    dark: {
+      cardBg: '#1f1f1f',
+      textPrimary: 'rgba(255, 255, 255, 0.85)',
+      textSecondary: 'rgba(255, 255, 255, 0.45)',
+      primary: '#177ddc',
+      secondaryBg: '#111b26',
+      border: '#303030',
+      buttonBg: '#1d1d1d',
+    }
+  };
+
+  const colors = themeColors[theme];
+
   useEffect(() => {
     fetchVacations();
-    const interval = setInterval(fetchVacations, 5000); // Fetch data every 5 seconds
-
-    return () => clearInterval(interval); // Cleanup interval on unmount
+    const interval = setInterval(fetchVacations, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchVacations = async () => {
@@ -52,47 +79,66 @@ const Banner = ({ userId }) => {
     setVacationDays(totalDays);
   };
 
-  const showDrawer = () => {
-    setDrawerVisible(true);
-  };
-
-  const closeDrawer = () => {
-    setDrawerVisible(false);
-  };
-
-  const showSecondDrawer = () => {
-    setSecondDrawerVisible(true);
-  };
-
-  const closeSecondDrawer = () => {
-    setSecondDrawerVisible(false);
-  };
+  const showDrawer = () => setDrawerVisible(true);
+  const closeDrawer = () => setDrawerVisible(false);
+  const showSecondDrawer = () => setSecondDrawerVisible(true);
+  const closeSecondDrawer = () => setSecondDrawerVisible(false);
 
   return (
     <>
-      <Card style={{ 
-        padding: '20px', 
-        borderRadius: '10px', 
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        marginBottom: '20px'
-      }}>
+      <Card 
+        style={{ 
+          padding: '20px',
+          borderRadius: '10px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          marginBottom: '20px',
+          backgroundColor: colors.cardBg,
+          borderColor: colors.border
+        }}
+      >
         <Flex justify="space-between" align="center" wrap="wrap" gap={16}>
           <Flex vertical align="flex-start" style={{ flex: 1, minWidth: 250 }}>
-            <Typography.Title level={2} style={{ color: '#1890ff', fontWeight: 'bold' }}>
+            <Title 
+              level={2} 
+              style={{ 
+                color: colors.primary, 
+                fontWeight: 'bold',
+                marginBottom: 8
+              }}
+            >
               Demande de congé
-            </Typography.Title>
-            <Typography.Text type="secondary" style={{ fontSize: '16px' }}>
+            </Title>
+            <Text 
+              type="secondary" 
+              style={{ 
+                fontSize: '16px',
+                color: colors.textSecondary
+              }}
+            >
               Faire une demande de congé
-            </Typography.Text>
+            </Text>
             <Flex gap={16} style={{ marginTop: '20px' }}>
-              <Button type="primary" size="large" style={{ borderRadius: '5px' }} onClick={showDrawer}>
+              <Button 
+                type="primary" 
+                size="large" 
+                style={{ 
+                  borderRadius: '5px',
+                  backgroundColor: colors.primary
+                }} 
+                onClick={showDrawer}
+              >
                 Demande
               </Button>
-              <Button size="large" style={{ 
-                borderRadius: '5px', 
-                backgroundColor: '#fafafa', 
-                border: '1px solid #d9d9d9' 
-              }} onClick={showSecondDrawer}>
+              <Button 
+                size="large" 
+                style={{ 
+                  borderRadius: '5px',
+                  backgroundColor: colors.buttonBg,
+                  borderColor: colors.border,
+                  color: colors.textPrimary
+                }} 
+                onClick={showSecondDrawer}
+              >
                 Consulter votre demande
               </Button>
             </Flex>
@@ -108,16 +154,17 @@ const Banner = ({ userId }) => {
               flexDirection: 'column',
               justifyContent: 'center',
               borderRadius: '10px',
-              backgroundColor: '#f0f5ff',
+              backgroundColor: colors.secondaryBg,
+              borderColor: colors.border
             }}
             bordered
           >
-            <Typography.Title level={4} style={{ color: '#1890ff' }}>
+            <Title level={4} style={{ color: colors.primary, marginBottom: 8 }}>
               {vacationDays} / 25
-            </Typography.Title>
-            <Typography.Text style={{ fontSize: '14px', color: '#595959' }}>
+            </Title>
+            <Text style={{ fontSize: '14px', color: colors.textSecondary }}>
               Jours par an
-            </Typography.Text>
+            </Text>
           </Card>
         </Flex>
       </Card>
@@ -128,6 +175,16 @@ const Banner = ({ userId }) => {
         onClose={closeDrawer}
         open={drawerVisible}
         width={700}
+        styles={{
+          body: {
+            backgroundColor: colors.cardBg,
+            color: colors.textPrimary
+          },
+          header: {
+            backgroundColor: colors.cardBg,
+            borderBottomColor: colors.border
+          }
+        }}
       >
         <CongeForm />
       </Drawer>
@@ -138,6 +195,16 @@ const Banner = ({ userId }) => {
         onClose={closeSecondDrawer}
         open={secondDrawerVisible}
         width={900}
+        styles={{
+          body: {
+            backgroundColor: colors.cardBg,
+            color: colors.textPrimary
+          },
+          header: {
+            backgroundColor: colors.cardBg,
+            borderBottomColor: colors.border
+          }
+        }}
       >
         <VacData setTotalVacationDays={setVacationDays} />
       </Drawer>

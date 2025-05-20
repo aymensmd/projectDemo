@@ -1,47 +1,43 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
-export const useRealTimeData = (endpoint, interval = 5000) => {
+export const useRealTimeData = (url, interval = 30000) => {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isPolling, setIsPolling] = useState(true);
 
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('ACCESS_TOKEN');
-      
-      if (!token) {
-        throw new Error('No authentication token');
-      }
-
-      const response = await axios.get(endpoint, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Accept': 'application/json'
-        }
-      });
-
-      setData(response.data);
       setError(null);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setError(error.message);
+      const response = await axios.get(url);
+      if (response.status === 200) {
+        setData(response.data);
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (err) {
+      setError(err.message);
+      setIsPolling(false); // Stop polling on error
     } finally {
       setLoading(false);
     }
-  }, [endpoint]);
+  }, [url]);
 
   useEffect(() => {
-    // Initial fetch
-    fetchData();
+    if (!isPolling) return;
 
-    // Set up polling interval
+    fetchData();
     const intervalId = setInterval(fetchData, interval);
 
-    // Cleanup
     return () => clearInterval(intervalId);
-  }, [fetchData, interval]);
+  }, [fetchData, interval, isPolling]);
 
-  return { data, loading, error, refresh: fetchData };
-}; 
+  const refresh = useCallback(() => {
+    setIsPolling(true);
+    fetchData();
+  }, [fetchData]);
+
+  return { data, loading, error, refresh };
+};

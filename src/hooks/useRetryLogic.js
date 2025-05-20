@@ -11,11 +11,11 @@ export const useRetryLogic = (callback, maxRetries = 3, baseDelay = 1000) => {
     try {
       setIsRetrying(true);
       await callback();
-      setRetryCount(0);
+      setRetryCount(0); // Reset retry count on success
     } catch (error) {
       if (retryCount < maxRetries) {
         const delay = baseDelay * Math.pow(2, retryCount);
-        
+
         // Clear any existing timeout
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
@@ -27,6 +27,7 @@ export const useRetryLogic = (callback, maxRetries = 3, baseDelay = 1000) => {
           executeWithRetry();
         }, delay);
       } else {
+        console.error('Max retries reached:', error);
         throw error; // Re-throw after max retries
       }
     } finally {
@@ -47,6 +48,6 @@ export const useRetryLogic = (callback, maxRetries = 3, baseDelay = 1000) => {
     executeWithRetry,
     retryCount,
     isRetrying,
-    resetRetries: () => setRetryCount(0)
+    resetRetries: () => setRetryCount(0),
   };
-}; 
+};

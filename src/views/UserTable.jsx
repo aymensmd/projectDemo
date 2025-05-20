@@ -1,63 +1,75 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Input, Button, message, Drawer, Form, Input as AntInput, Select, Space, Popconfirm } from 'antd';
-import { SearchOutlined, UserOutlined, InfoCircleOutlined, DownloadOutlined } from '@ant-design/icons';
+import { Card, Table, Input, Button, message, Drawer, Form, Select, Space, Popconfirm, Typography, ConfigProvider } from 'antd';
+import { SearchOutlined, PlusOutlined, FilterOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import dayjs from 'dayjs';
 import { useRealTimeData } from '../hooks/useRealTimeData';
+import { useStateContext } from '../contexts/ContextProvider';
 
 const { Option } = Select;
+const { Title } = Typography;
 
 const UserTable = () => {
+  const { theme } = useStateContext();
   const [searchText, setSearchText] = useState('');
   const [department, setDepartment] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
   const [form] = Form.useForm();
-  
-  // Use real-time data hook for users
+
   const { data: users, loading, error, refresh } = useRealTimeData('http://127.0.0.1:8000/api/employees');
 
-  // Compute unique department options
-  const departmentOptions = [
-    { id: 1, name: 'Sales' },
-    { id: 2, name: 'IT' },
-    { id: 3, name: 'HR' },
-    { id: 4, name: 'Marketing' },
-    { id: 5, name: 'Finance' },
-  ]; // Replace with actual API call if needed
+  // Theme styles
+  const themeStyles = {
+    light: {
+      cardBg: '#ffffff',
+      textPrimary: '#222222',
+      textSecondary: '#595959',
+      border: '#f0f0f0',
+      primary: '#1890ff',
+      headerBg: '#f5f5f5',
+    },
+    dark: {
+      cardBg: '#1f1f1f',
+      textPrimary: 'rgba(255, 255, 255, 0.85)',
+      textSecondary: 'rgba(255, 255, 255, 0.45)',
+      border: '#303030',
+      primary: '#177ddc',
+      headerBg: '#141414',
+    }
+  };
+
+  const colors = themeStyles[theme];
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:8000/api/departments');
+      if (response.status === 200 && Array.isArray(response.data)) {
+        setDepartmentOptions(response.data);
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (error) {
+      message.error('Failed to fetch departments. Please check the API endpoint.');
+      console.error('Error fetching departments:', error);
+    }
+  };
 
   useEffect(() => {
-    console.log('Fetched users:', users); // Log the users data to inspect its structure
-    const handler = (e) => exportToCSV(e.detail);
-    window.addEventListener('export-employees-csv', handler);
-    return () => window.removeEventListener('export-employees-csv', handler);
-  }, [users]);
-
-  const exportToCSV = (data) => {
-    if (!data || !data.length) return;
-    const replacer = (key, value) => value === null ? '' : value;
-    const header = Object.keys(data[0]);
-    const csv = [
-      header.join(','),
-      ...data.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
-    ].join('\r\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'employes.csv';
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
+    fetchDepartments();
+  }, []);
 
   const handleUpdateFormSubmit = async (values) => {
     try {
       const token = localStorage.getItem('ACCESS_TOKEN');
       const updatedData = {
-        ...values,
-        department: { name: values.department }, // Adjusted to match API structure
-        role: { name: values.role }, // Adjusted to match API structure
+        name: values.name,
+        email: values.email,
+        department_id: values.department,
+        role_id: values.role,
       };
+
       await axios.put(`http://127.0.0.1:8000/api/employees/${selectedUser.id}`, updatedData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,41 +79,39 @@ const UserTable = () => {
 
       message.success('User updated successfully');
       setDrawerVisible(false);
-      refresh(); // Refresh data after update
+      refresh();
     } catch (error) {
       message.error('Failed to update user');
       console.error('Update error:', error);
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      const token = localStorage.getItem('ACCESS_TOKEN');
-      await axios.delete(`http://127.0.0.1:8000/api/employees/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Accept': 'application/json'
-        }
-      });
-      
-      message.success('User deleted successfully');
-      refresh(); // Refresh data after delete
-    } catch (error) {
-      message.error('Failed to delete user');
-      console.error('Delete error:', error);
-    }
+  const handleResetFilters = () => {
+    setSearchText('');
+    setDepartment('');
+    setRoleFilter('');
   };
+
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.name.toLowerCase().includes(searchText.toLowerCase()) ||
+                          user.email.toLowerCase().includes(searchText.toLowerCase());
+    const matchesDepartment = department ? user.department_id === department : true;
+    const matchesRole = roleFilter ? user.role?.name === roleFilter : true;
+    return matchesSearch && matchesDepartment && matchesRole;
+  });
 
   const columns = [
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
+      render: (text) => <span style={{ color: colors.textPrimary }}>{text}</span>,
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
+      render: (text) => <span style={{ color: colors.textPrimary }}>{text}</span>,
     },
     {
       title: 'Department',
@@ -109,14 +119,14 @@ const UserTable = () => {
       key: 'department',
       render: (departmentId) => {
         const department = departmentOptions.find(dep => dep.id === departmentId);
-        return department ? department.name : 'N/A';
+        return <span style={{ color: colors.textPrimary }}>{department ? department.name : 'N/A'}</span>;
       },
     },
     {
       title: 'Role',
       dataIndex: ['role', 'name'],
       key: 'role',
-      render: (role) => role || 'N/A',
+      render: (role) => <span style={{ color: colors.textPrimary }}>{role || 'N/A'}</span>,
     },
     {
       title: 'Actions',
@@ -147,77 +157,133 @@ const UserTable = () => {
     },
   ];
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
   return (
-    <div>
-      <Input
-        placeholder="Search"
-        value={searchText}
-        onChange={e => setSearchText(e.target.value)}
-        style={{ marginBottom: 8, width: '100%' }}
-        prefix={<SearchOutlined />}
-        allowClear
-      />
-      {/* Department button filter below search bar */}
-      <div style={{ margin: '8px 0 16px 0', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-        <Button size="small" onClick={() => setDepartment('')} type={!department ? 'primary' : 'default'}>Tous</Button>
-        {departmentOptions.map(dep => (
-          <Button key={dep.id} size="small" onClick={() => setDepartment(dep.name)} type={department === dep.name ? 'primary' : 'default'}>{dep.name}</Button>
-        ))}
-      </div>
-      <Button onClick={() => setSearchText('')} style={{ marginBottom: 16 }}>Reset</Button>
-      <Table
-        columns={columns}
-        dataSource={users}
-        loading={loading}
-        rowKey="id"
-        scroll={{ x: 'max-content' }}
-        style={{ background: '#f0f5ff', borderRadius: 12, boxShadow: '0 2px 8px #e6f0ff', marginTop: 16 }}
-      />
-
-      <Drawer
-        title="Edit User"
-        placement="right"
-        onClose={() => setDrawerVisible(false)}
-        visible={drawerVisible}
-        width={500}
+    <ConfigProvider
+      theme={{
+        token: {
+          colorBgContainer: colors.cardBg,
+          colorText: colors.textPrimary,
+          colorBorder: colors.border,
+          colorPrimary: colors.primary,
+        },
+      }}
+    >
+      <Card 
+        style={{ 
+          margin: '20px', 
+          borderRadius: '12px', 
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          background: colors.cardBg
+        }}
       >
-        <Form
-          layout="vertical"
-          form={form}
-          onFinish={handleUpdateFormSubmit}
+        <Title level={3} style={{ marginBottom: '20px', textAlign: 'center', color: colors.textPrimary }}>
+          User Management
+        </Title>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', gap: 8 }}>
+          <Input
+            placeholder="Search by name or email"
+            value={searchText}
+            onChange={e => setSearchText(e.target.value)}
+            style={{ width: '300px' }}
+            prefix={<SearchOutlined />}
+            allowClear
+          />
+          <Select
+            placeholder="Filter by Role"
+            value={roleFilter}
+            onChange={value => setRoleFilter(value)}
+            style={{ width: '200px' }}
+            allowClear
+          >
+            <Option value="Admin">Admin</Option>
+            <Option value="Moderator">Moderator</Option>
+          </Select>
+          <Button type="default" icon={<FilterOutlined />} onClick={handleResetFilters}>
+            Reset Filters
+          </Button>
+         
+        </div>
+        <Table
+          columns={columns}
+          dataSource={filteredUsers}
+          loading={loading}
+          rowKey="id"
+          pagination={{ pageSize: 5 }}
+          style={{ 
+            background: colors.cardBg, 
+            borderRadius: '12px', 
+            overflow: 'hidden',
+            border: `1px solid ${colors.border}`
+          }}
+        />
+
+        <Drawer
+          title={selectedUser ? 'Edit User' : 'Add User'}
+          placement="right"
+          onClose={() => setDrawerVisible(false)}
+          open={drawerVisible}
+          width={400}
+          styles={{
+            body: {
+              background: colors.cardBg,
+              color: colors.textPrimary
+            },
+            header: {
+              background: colors.cardBg,
+              borderBottom: `1px solid ${colors.border}`
+            }
+          }}
         >
-          <Form.Item name="id" style={{ display: 'none' }}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Please enter name' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Please enter email' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="department" label="Department" rules={[{ required: true, message: 'Please select department' }]}>
-            <Select>
-              {departmentOptions.map(dep => (
-                <Option key={dep.id} value={dep.id}>{dep.name}</Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item name="role" label="Role" rules={[{ required: true, message: 'Please select role' }]}>
-            <Select>
-              <Option value="Admin">Admin</Option>
-              <Option value="Moderator">Moderator</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">Update</Button>
-          </Form.Item>
-        </Form>
-      </Drawer>
-    </div>
+          <Form
+            layout="vertical"
+            form={form}
+            onFinish={handleUpdateFormSubmit}
+            style={{ padding: '10px' }}
+          >
+            <Form.Item 
+              name="name" 
+              label="Name" 
+              rules={[{ required: true, message: 'Please enter name' }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item 
+              name="email" 
+              label="Email" 
+              rules={[{ required: true, message: 'Please enter email' }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item 
+              name="department" 
+              label="Department" 
+              rules={[{ required: true, message: 'Please select department' }]}
+            >
+              <Select>
+                {departmentOptions.map(dep => (
+                  <Option key={dep.id} value={dep.id}>{dep.name}</Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item 
+              name="role" 
+              label="Role" 
+              rules={[{ required: true, message: 'Please select role' }]}
+            >
+              <Select>
+                <Option value="Admin">Admin</Option>
+                <Option value="Moderator">Moderator</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit" block>
+                {selectedUser ? 'Update User' : 'Add User'}
+              </Button>
+            </Form.Item>
+          </Form>
+        </Drawer>
+      </Card>
+    </ConfigProvider>
   );
 };
 

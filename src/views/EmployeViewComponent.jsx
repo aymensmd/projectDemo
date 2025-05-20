@@ -1,20 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Card, Drawer, Typography, Row, Col, Statistic, Divider, Tooltip } from 'antd';
+import { Button, Card, Drawer, Typography, Row, Col, Statistic, Divider, ConfigProvider } from 'antd';
 import { PlusOutlined, UserOutlined } from '@ant-design/icons';
 import Layout from 'antd/es/layout/layout';
 import Form from '../Form/index';
 import UserTable from './UserTable';
 import axios from 'axios';
 import dayjs from 'dayjs';
+import { useStateContext } from '../contexts/ContextProvider';
 
 const { Content } = Layout;
+const { Title, Text } = Typography;
 
 const EmployeViewComponent = () => {
+  const { theme } = useStateContext();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [loading, setLoading] = useState(true);
+
+  // Theme styles
+  const themeStyles = {
+    light: {
+      cardBg: '#ffffff',
+      textPrimary: '#222222',
+      textSecondary: '#595959',
+      border: '#f0f0f0',
+      primary: '#1890ff',
+      infoBg: '#f0f5ff',
+      statsBg: '#f6f9ff',
+    },
+    dark: {
+      cardBg: '#1f1f1f',
+      textPrimary: 'rgba(255, 255, 255, 0.85)',
+      textSecondary: 'rgba(255, 255, 255, 0.45)',
+      border: '#303030',
+      primary: '#177ddc',
+      infoBg: '#111b26',
+      statsBg: '#141d26',
+    }
+  };
+
+  const colors = themeStyles[theme];
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -69,85 +96,122 @@ const EmployeViewComponent = () => {
   });
 
   return (
-    <Content className="content">
-      <Card style={{ margin: 16, padding: 24 }} loading={loading}>
-        <Typography.Title level={3} style={{ marginBottom: 0 }}>Gestion des employés</Typography.Title>
-        <Typography.Text type="secondary" style={{ fontSize: 16 }}>
-          Ajoutez, modifiez, filtrez, exportez et consultez les informations des employés.
-        </Typography.Text>
-        <Divider />
-        <Row gutter={[32, 32]}>
-          <Col xs={24} md={16}>
-            <div style={{ background: '#f6f9ff', borderRadius: 12, padding: 24, boxShadow: '0 2px 8px #e6f0ff' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                {/* Buttons on the top right */}
-                <div style={{ flex: 1 }} />
-                <div style={{ display: 'flex', gap: 12 }}>
-                  <Button
-                    icon={<PlusOutlined />} 
-                    type="primary" 
-                    size="large"
-                    style={{ fontWeight: 600 }}
-                    onClick={() => setDrawerVisible(true)}
-                  >
-                    Ajouter
-                  </Button>
-                  <Button
-                    size="large"
-                    style={{ fontWeight: 600 }}
-                    onClick={() => window.dispatchEvent(new CustomEvent('export-employees-csv', { detail: filteredEmployees }))}
-                  >
-                    Exporter CSV
-                  </Button>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorBgContainer: colors.cardBg,
+          colorText: colors.textPrimary,
+          colorBorder: colors.border,
+          colorPrimary: colors.primary,
+        },
+      }}
+    >
+      <Content className="content">
+        <Card style={{ margin: 16, padding: 24, background: colors.cardBg }} loading={loading}>
+          <Title level={3} style={{ marginBottom: 0, color: colors.textPrimary }}>Gestion des employés</Title>
+          <Text type="secondary" style={{ fontSize: 16, color: colors.textSecondary }}>
+            Ajoutez, modifiez, filtrez, exportez et consultez les informations des employés.
+          </Text>
+          <Divider />
+          <Row gutter={[32, 32]}>
+            <Col xs={24} md={16}>
+              <div style={{ background: colors.statsBg, borderRadius: 12, padding: 24, boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <div style={{ flex: 1 }} />
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    <Button
+                      icon={<PlusOutlined />} 
+                      type="primary" 
+                      size="large"
+                      style={{ fontWeight: 600 }}
+                      onClick={() => setDrawerVisible(true)}
+                    >
+                      Ajouter
+                    </Button>
+                    <Button
+                      size="large"
+                      style={{ fontWeight: 600 }}
+                      onClick={() => window.dispatchEvent(new CustomEvent('export-employees-csv', { detail: filteredEmployees }))}
+                    >
+                      Exporter CSV
+                    </Button>
+                  </div>
                 </div>
+              
+                <UserTable employees={filteredEmployees} />
               </div>
-             
-              <UserTable employees={filteredEmployees} />
-            </div>
-          </Col>
-          <Col xs={24} md={8}>
-            <Card bordered={false} style={{ background: '#f0f5ff', borderRadius: 12, marginBottom: 24 }}>
-              <Statistic
-                title="Nombre total d'employés"
-                value={employees.length}
-                prefix={<UserOutlined />}
-              />
-            </Card>
-            <Card bordered={false} style={{ background: '#f0f5ff', borderRadius: 12, marginBottom: 24 }}>
-              <Typography.Title level={5} style={{ marginBottom: 8 }}>Répartition par département</Typography.Title>
-              {departmentList.length === 0 ? (
-                <Typography.Text type="secondary">Aucun département</Typography.Text>
-              ) : (
-                <ul style={{ paddingLeft: 18, margin: 0 }}>
-                  {departmentList.map(d => (
-                    <li key={d.dept} style={{ fontWeight: departmentFilter === d.dept ? 600 : 400, color: departmentFilter === d.dept ? '#1677ff' : '#222' }}>{d.dept}: {d.count}</li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-            <Card bordered={false} style={{ background: '#f0f5ff', borderRadius: 12 }}>
-              <Typography.Title level={5}>Nouvelles embauches</Typography.Title>
-              {recentHires.length === 0 ? <Typography.Text type="secondary">Aucune embauche récente</Typography.Text> : recentHires.map(e => <div key={e.id}>{e.name} ({e.department}) - {dayjs(e.created_at).format('DD/MM/YYYY')}</div>)}
-              <Divider style={{ margin: '12px 0' }} />
-              <Typography.Title level={5}>Anniversaires & Entrées à venir</Typography.Title>
-              {upcomingBirthdays.length === 0 && upcomingAnniversaries.length === 0 ? <Typography.Text type="secondary">Aucun événement à venir</Typography.Text> : <>
-                {upcomingBirthdays.map(e => <div key={e.id + '-bday'}>🎂 {e.name} - {dayjs(e.birthday).format('DD/MM')}</div>)}
-                {upcomingAnniversaries.map(e => <div key={e.id + '-anniv'}>🎉 {e.name} - {dayjs(e.created_at).format('DD/MM')}</div>)}
-              </>}
-            </Card>
-          </Col>
-        </Row>
-      </Card>
-      <Drawer
-        title="Ajouter un employé"
-        placement="right"
-        onClose={() => setDrawerVisible(false)}
-        open={drawerVisible}
-        width={window.innerWidth > 1508 ? 1000 : '100%'}
-      >
-        <Form />
-      </Drawer>
-    </Content>
+            </Col>
+            <Col xs={24} md={8}>
+              <Card bordered={false} style={{ background: colors.infoBg, borderRadius: 12, marginBottom: 24 }}>
+                <Statistic
+                  title="Nombre total d'employés"
+                  value={employees.length}
+                  prefix={<UserOutlined />}
+                  valueStyle={{ color: colors.textPrimary }}
+                />
+              </Card>
+              <Card bordered={false} style={{ background: colors.infoBg, borderRadius: 12, marginBottom: 24 }}>
+                <Title level={5} style={{ marginBottom: 8, color: colors.textPrimary }}>Répartition par département</Title>
+                {departmentList.length === 0 ? (
+                  <Text type="secondary">Aucun département</Text>
+                ) : (
+                  <ul style={{ paddingLeft: 18, margin: 0 }}>
+                    {departmentList.map(d => (
+                      <li 
+                        key={d.dept} 
+                        style={{ 
+                          fontWeight: departmentFilter === d.dept ? 600 : 400, 
+                          color: departmentFilter === d.dept ? colors.primary : colors.textPrimary,
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => handleDepartmentFilter(d.dept)}
+                      >
+                        {d.dept}: {d.count}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Card>
+              <Card bordered={false} style={{ background: colors.infoBg, borderRadius: 12 }}>
+                <Title level={5} style={{ color: colors.textPrimary }}>Nouvelles embauches</Title>
+                {recentHires.length === 0 ? 
+                  <Text type="secondary">Aucune embauche récente</Text> : 
+                  recentHires.map(e => <div key={e.id} style={{ color: colors.textPrimary }}>{e.name} ({e.department}) - {dayjs(e.created_at).format('DD/MM/YYYY')}</div>)
+                }
+                <Divider style={{ margin: '12px 0' }} />
+                <Title level={5} style={{ color: colors.textPrimary }}>Anniversaires & Entrées à venir</Title>
+                {upcomingBirthdays.length === 0 && upcomingAnniversaries.length === 0 ? 
+                  <Text type="secondary">Aucun événement à venir</Text> : 
+                  <>
+                    {upcomingBirthdays.map(e => <div key={e.id + '-bday'} style={{ color: colors.textPrimary }}>🎂 {e.name} - {dayjs(e.birthday).format('DD/MM')}</div>)}
+                    {upcomingAnniversaries.map(e => <div key={e.id + '-anniv'} style={{ color: colors.textPrimary }}>🎉 {e.name} - {dayjs(e.created_at).format('DD/MM')}</div>)}
+                  </>
+                }
+              </Card>
+            </Col>
+          </Row>
+        </Card>
+        <Drawer
+          title="Ajouter un employé"
+          placement="right"
+          onClose={() => setDrawerVisible(false)}
+          open={drawerVisible}
+          width={window.innerWidth > 1508 ? 1000 : '100%'}
+          styles={{
+            body: {
+              background: colors.cardBg,
+              color: colors.textPrimary
+            },
+            header: {
+              background: colors.cardBg,
+              borderBottom: `1px solid ${colors.border}`
+            }
+          }}
+        >
+          <Form />
+        </Drawer>
+      </Content>
+    </ConfigProvider>
   );
 };
 

@@ -10,9 +10,10 @@ export const useVacationPolling = (userId, interval = 30000) => {
   const isAuthenticated = useAuthCheck();
   const intervalRef = useRef(null);
   const isMounted = useRef(true);
+  const [isPolling, setIsPolling] = useState(true);
 
   const fetchVacations = useCallback(async () => {
-    if (!isAuthenticated || isLoading) return;
+    if (!isAuthenticated || isLoading || !isPolling) return;
 
     try {
       setIsLoading(true);
@@ -26,8 +27,8 @@ export const useVacationPolling = (userId, interval = 30000) => {
       const response = await axios.get(`http://127.0.0.1:8000/api/vacations/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
-        }
+          'Accept': 'application/json',
+        },
       });
 
       if (isMounted.current) {
@@ -36,7 +37,8 @@ export const useVacationPolling = (userId, interval = 30000) => {
     } catch (error) {
       if (isMounted.current) {
         setError(error.response?.data?.message || error.message);
-        
+        setIsPolling(false); // Stop polling on error
+
         if (error.response?.status === 401) {
           localStorage.removeItem('token');
           window.location.href = '/login';
@@ -47,7 +49,7 @@ export const useVacationPolling = (userId, interval = 30000) => {
         setIsLoading(false);
       }
     }
-  }, [userId, isLoading, isAuthenticated]);
+  }, [userId, isLoading, isAuthenticated, isPolling]);
 
   // Wrap fetchVacations with retry logic
   const { executeWithRetry } = useRetryLogic(fetchVacations);
@@ -55,11 +57,15 @@ export const useVacationPolling = (userId, interval = 30000) => {
   useEffect(() => {
     isMounted.current = true;
 
+    if (!isPolling) return; // Skip polling if disabled
+
     // Initial fetch
     executeWithRetry();
 
     // Set up polling interval
-    intervalRef.current = setInterval(executeWithRetry, interval);
+    intervalRef.current = setInterval(() => {
+      if (isPolling) executeWithRetry();
+    }, interval);
 
     // Cleanup
     return () => {
@@ -68,12 +74,17 @@ export const useVacationPolling = (userId, interval = 30000) => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [executeWithRetry, interval]);
+  }, [executeWithRetry, interval, isPolling]);
+
+  const refresh = useCallback(() => {
+    setIsPolling(true); // Re-enable polling if it was stopped
+    executeWithRetry();
+  }, [executeWithRetry]);
 
   return {
     vacations,
     error,
     isLoading,
-    refresh: executeWithRetry
+    refresh,
   };
-}; 
+};

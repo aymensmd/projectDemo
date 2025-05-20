@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Spin, Alert, Empty } from 'antd';
 import { useVacationPolling } from '../hooks/useVacationPolling';
 import { useAuth } from '../context/AuthContext';
+import './Banner.css'; // Import CSS for animations
 
 const Banner = () => {
   const { user } = useAuth();
@@ -9,18 +10,16 @@ const Banner = () => {
 
   if (isLoading) {
     return (
-      <Card>
-        <div style={{ textAlign: 'center', padding: '20px' }}>
-          <Spin size="large" />
-          <p>Loading vacation requests...</p>
-        </div>
+      <Card className="fade-in" style={{ textAlign: 'center', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', background: 'linear-gradient(135deg, #f5f7fa, #e6f0ff)' }}>
+        <Spin size="large" />
+        <p style={{ marginTop: '10px', fontSize: '16px', color: '#555' }}>Loading vacation requests...</p>
       </Card>
     );
   }
 
   if (error) {
     return (
-      <Card>
+      <Card className="fade-in" style={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', background: 'linear-gradient(135deg, #ffe6e6, #fff)' }}>
         <Alert
           message="Error"
           description={error}
@@ -33,7 +32,7 @@ const Banner = () => {
 
   if (!vacations || vacations.length === 0) {
     return (
-      <Card>
+      <Card className="fade-in" style={{ textAlign: 'center', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', background: 'linear-gradient(135deg, #f5f7fa, #e6f0ff)' }}>
         <Empty
           description="No vacation requests found"
           image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -43,40 +42,19 @@ const Banner = () => {
   }
 
   return (
-    <Card title="Vacation Requests">
-      <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-        {vacations.map(vacation => (
-          <Card.Grid
-            key={vacation.id}
-            style={{
-              width: '100%',
-              textAlign: 'left',
-              marginBottom: '8px',
-              background: vacation.status === 'En attente' ? '#fffbe6' : 
-                         vacation.status === 'Approuvé' ? '#f6ffed' : '#fff1f0'
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <h4>{vacation.type}</h4>
-                <p>From: {new Date(vacation.start_date).toLocaleDateString()}</p>
-                <p>To: {new Date(vacation.end_date).toLocaleDateString()}</p>
-                <p>Status: {vacation.status}</p>
-              </div>
-              <div>
-                <p style={{ 
-                  color: vacation.status === 'En attente' ? '#faad14' : 
-                         vacation.status === 'Approuvé' ? '#52c41a' : '#f5222d'
-                }}>
-                  {vacation.status}
-                </p>
-              </div>
-            </div>
-          </Card.Grid>
+    <Card className="fade-in" style={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', background: 'linear-gradient(135deg, #f5f7fa, #e6f0ff)' }}>
+      <h3 style={{ textAlign: 'center', marginBottom: '20px', fontSize: '18px', color: '#333' }}>Vacation Requests</h3>
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        {vacations.map((vacation) => (
+          <li key={vacation.id} className="fade-in" style={{ marginBottom: '10px', padding: '10px', borderRadius: '8px', background: '#fff', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', transition: 'transform 0.2s', cursor: 'pointer' }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
+            <strong>{vacation.type}</strong> from {vacation.start_date} to {vacation.end_date}
+          </li>
         ))}
-      </div>
+      </ul>
     </Card>
   );
 };
 
-export default Banner; 
+export default Banner;

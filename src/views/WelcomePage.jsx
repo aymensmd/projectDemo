@@ -1,0 +1,437 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Card, Row, Col, Typography, Button, Space, Divider, Avatar, 
+  Carousel, Tag, Statistic, Progress, Badge 
+} from 'antd';
+import { 
+  TeamOutlined, UserOutlined, DashboardOutlined, MessageOutlined, 
+  SettingOutlined, CalendarOutlined, RocketOutlined, 
+  TrophyOutlined, CheckCircleOutlined, StarOutlined,
+  ArrowRightOutlined, NotificationOutlined, ProjectOutlined
+} from '@ant-design/icons';
+import { useStateContext } from '../contexts/ContextProvider';
+import { motion } from 'framer-motion';
+import CountUp from 'react-countup';
+import './welcomePage.css';
+
+const { Title, Text, Paragraph } = Typography;
+
+const WelcomePage = () => {
+  const { user, theme } = useStateContext();
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [stats, setStats] = useState(null);
+
+  // Theme-aware colors
+  const themeColors = {
+    light: {
+      cardBg: '#ffffff',
+      textPrimary: '#222',
+      textSecondary: '#555',
+      border: '#f0f0f0',
+      primary: '#1890ff',
+      cardHover: '#fafafa',
+      divider: '#e8e8e8'
+    },
+    dark: {
+      cardBg: '#1f1f1f',
+      textPrimary: 'rgba(255, 255, 255, 0.85)',
+      textSecondary: 'rgba(255, 255, 255, 0.65)',
+      border: '#303030',
+      primary: '#177ddc',
+      cardHover: '#2a2a2a',
+      divider: '#434343'
+    }
+  };
+
+  const colors = themeColors[theme];
+
+  useEffect(() => {
+    setTimeout(() => {
+      setStats({
+        tasksCompleted: 87,
+        projectsActive: 12,
+        teamMembers: 24,
+        messagesUnread: 3
+      });
+    }, 1000);
+  }, []);
+
+  const bannerMessages = [
+    {
+      title: "Streamline Your Workflow",
+      content: "Our new dashboard helps you accomplish more in less time",
+      color: colors.primary
+    },
+    {
+      title: "Team Collaboration",
+      content: "Connect with your team through our integrated messaging system",
+      color: '#52c41a'
+    },
+    {
+      title: "Performance Insights",
+      content: "Track your progress with real-time analytics",
+      color: '#722ed1'
+    }
+  ];
+
+  const quickActions = [
+    { icon: <DashboardOutlined />, title: 'Dashboard', path: '/dashboard' },
+    { icon: <TeamOutlined />, title: 'Team', path: '/users_setting' },
+    { icon: <MessageOutlined />, title: 'Messages', path: '/dash/chat' },
+    { icon: <CalendarOutlined />, title: 'Calendar', path: '/calendar' },
+    { icon: <ProjectOutlined />, title: 'Projects', path: '/projects' },
+    { icon: <SettingOutlined />, title: 'Settings', path: '/settings' }
+  ];
+
+  const features = [
+    {
+      icon: <TrophyOutlined style={{ fontSize: 24 }} />,
+      title: "Achievements",
+      description: "Track your milestones and accomplishments"
+    },
+    {
+      icon: <CheckCircleOutlined style={{ fontSize: 24 }} />,
+      title: "Task Management",
+      description: "Organize and prioritize your work"
+    },
+    {
+      icon: <StarOutlined style={{ fontSize: 24 }} />,
+      title: "Performance",
+      description: "Monitor your productivity metrics"
+    }
+  ];
+
+  const motivationalMessages = [
+    "Success is not final, failure is not fatal: It is the courage to continue that counts.",
+    "The only limit to our realization of tomorrow is our doubts of today.",
+    "Do what you can with all you have, wherever you are.",
+    "Your work is going to fill a large part of your life, so do what you love."
+  ];
+
+  const [randomMessage] = useState(
+    motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)]
+  );
+
+  return (
+    <div className={`welcome-container ${theme}`} style={{ backgroundColor: theme === 'dark' ? '#141414' : '#f5f5f5' }}>
+      {/* Animated Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+       <Carousel 
+  autoplay 
+  effect="fade" 
+  beforeChange={(_, to) => setActiveSlide(to)}
+  className="promo-banner"
+>
+  {bannerMessages.map((item, index) => (
+    <div key={index} className="banner-slide" style={{ backgroundColor: item.color }}>
+      <div className="banner-content">
+        <Title 
+          level={3} 
+          style={{ 
+            color: theme === 'dark' ? 'white' : 'rgba(0, 0, 0, 0.85)', // Black for light theme
+            marginBottom: 8 
+          }}
+        >
+          {item.title}
+        </Title>
+        <Text style={{ color: theme === 'dark' ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.65)' }}>
+          {item.content}
+        </Text>
+        <Button 
+          type={theme === 'dark' ? 'default' : 'primary'}
+          shape="round" 
+          style={{ 
+            marginTop: 16,
+            backgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : undefined,
+            color: theme === 'dark' ? 'white' : undefined
+          }}
+          icon={<ArrowRightOutlined />}
+        >
+          Learn More
+        </Button>
+      </div>
+    </div>
+  ))}
+</Carousel>
+      </motion.div>
+
+      {/* Welcome Header */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+      >
+        <Row gutter={[24, 24]} align="middle" style={{ marginTop: 24 }}>
+          <Col>
+            <Badge dot status="success">
+              <Avatar 
+                size={64} 
+                src={user?.avatar} 
+                icon={<UserOutlined />} 
+                style={{ backgroundColor: colors.primary, color: '#fff' }}
+              />
+            </Badge>
+          </Col>
+          <Col flex="auto">
+            <Title level={2} style={{ marginBottom: 0, color: colors.textPrimary }}>
+              Welcome back, <span style={{ color: colors.primary }}>{user?.name || 'User'}</span>!
+            </Title>
+            <Text type="secondary" style={{ color: colors.textSecondary }}>
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </Text>
+          </Col>
+          <Col>
+            <Tag icon={<NotificationOutlined />} color="processing">
+              Latest Update: v2.1.0
+            </Tag>
+          </Col>
+        </Row>
+
+        {/* Motivational Quote */}
+        <Card 
+          bordered={false} 
+          style={{ 
+            margin: '24px 0',
+            background: theme === 'dark' ? 'rgba(24, 144, 255, 0.1)' : '#f6faff',
+            borderLeft: `4px solid ${colors.primary}`
+          }}
+        >
+          <Paragraph style={{ fontSize: 16, margin: 0, fontStyle: 'italic', color: colors.textPrimary }}>
+            "{randomMessage}"
+          </Paragraph>
+        </Card>
+      </motion.div>
+
+      {/* Quick Stats */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+      >
+        <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
+          {[
+            { title: 'Tasks Completed', value: stats?.tasksCompleted, icon: <CheckCircleOutlined />, extra: '87% of monthly goal' },
+            { title: 'Active Projects', value: stats?.projectsActive, icon: <ProjectOutlined />, extra: '3 nearing deadline' },
+            { title: 'Team Members', value: stats?.teamMembers, icon: <TeamOutlined />, extra: '2 new this week' },
+            { title: 'Unread Messages', value: stats?.messagesUnread, icon: <MessageOutlined />, extra: <Button type="link" size="small">View Messages</Button> }
+          ].map((stat, index) => (
+            <Col xs={24} sm={12} md={6} key={index}>
+              <Card 
+                hoverable
+                style={{ 
+                  backgroundColor: colors.cardBg,
+                  borderColor: colors.border
+                }}
+              >
+                <Statistic
+                  title={<Text style={{ color: colors.textSecondary }}>{stat.title}</Text>}
+                  value={stat.value || 0}
+                  prefix={stat.icon}
+                  valueRender={val => <CountUp end={val} duration={1} />}
+                  valueStyle={{ color: colors.textPrimary }}
+                />
+                {stat.extra && typeof stat.extra === 'string' ? (
+                  <Text type="secondary" style={{ color: colors.textSecondary }}>{stat.extra}</Text>
+                ) : stat.extra}
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </motion.div>
+
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.7, duration: 0.5 }}
+      >
+        <Card 
+          title={<Text style={{ color: colors.textPrimary }}>Quick Access</Text>}
+          extra={<Button type="link">See all</Button>}
+          style={{ 
+            marginBottom: 24,
+            backgroundColor: colors.cardBg,
+            borderColor: colors.border
+          }}
+          headStyle={{ borderColor: colors.border }}
+        >
+          <Row gutter={[16, 16]}>
+            {quickActions.map((action, index) => (
+              <Col xs={24} sm={12} md={8} lg={6} key={index}>
+                <motion.div whileHover={{ y: -5 }}>
+                  <Card 
+                    hoverable
+                    className="quick-action-card"
+                    onClick={() => window.location.pathname = action.path}
+                    style={{
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.border
+                    }}
+                    bodyStyle={{ textAlign: 'center' }}
+                  >
+                    <div style={{ 
+                      fontSize: 32,
+                      color: colors.primary,
+                      marginBottom: 16,
+                      transition: 'all 0.3s'
+                    }}>
+                      {action.icon}
+                    </div>
+                    <Title level={5} style={{ margin: 0, color: colors.textPrimary }}>{action.title}</Title>
+                  </Card>
+                </motion.div>
+              </Col>
+            ))}
+          </Row>
+        </Card>
+      </motion.div>
+
+      {/* Features and Recent Activity */}
+      <Row gutter={[24, 24]}>
+        <Col xs={24} md={12}>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.9, duration: 0.5 }}
+          >
+            <Card 
+              title={<Text style={{ color: colors.textPrimary }}>Key Features</Text>}
+              style={{
+                backgroundColor: colors.cardBg,
+                borderColor: colors.border
+              }}
+              headStyle={{ borderColor: colors.border }}
+            >
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                {features.map((feature, index) => (
+                  <Card 
+                    key={index} 
+                    size="small" 
+                    hoverable
+                    style={{
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.border
+                    }}
+                  >
+                    <Row align="middle" gutter={12}>
+                      <Col>{feature.icon}</Col>
+                      <Col flex="auto">
+                        <Text strong style={{ color: colors.textPrimary }}>{feature.title}</Text>
+                        <br />
+                        <Text type="secondary" style={{ color: colors.textSecondary }}>{feature.description}</Text>
+                      </Col>
+                      <Col>
+                        <Button type="text" icon={<ArrowRightOutlined />} />
+                      </Col>
+                    </Row>
+                  </Card>
+                ))}
+              </Space>
+            </Card>
+          </motion.div>
+        </Col>
+        <Col xs={24} md={12}>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.9, duration: 0.5 }}
+          >
+            <Card 
+              title={<Text style={{ color: colors.textPrimary }}>Recent Activity</Text>}
+              extra={<Button type="link">View All</Button>}
+              style={{
+                backgroundColor: colors.cardBg,
+                borderColor: colors.border
+              }}
+              headStyle={{ borderColor: colors.border }}
+            >
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                {[1, 2, 3].map((item) => (
+                  <Card 
+                    key={item} 
+                    size="small" 
+                    hoverable
+                    style={{
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.border
+                    }}
+                  >
+                    <Row align="middle">
+                      <Col flex="none" style={{ marginRight: 12 }}>
+                        <Avatar size="small" icon={<UserOutlined />} />
+                      </Col>
+                      <Col flex="auto">
+                        <Text strong style={{ color: colors.textPrimary }}>Project {item} updated</Text>
+                        <br />
+                        <Text type="secondary" style={{ color: colors.textSecondary }}>2 hours ago by Team Member</Text>
+                      </Col>
+                      <Col flex="none">
+                        <Tag color="processing">Update</Tag>
+                      </Col>
+                    </Row>
+                  </Card>
+                ))}
+              </Space>
+            </Card>
+          </motion.div>
+        </Col>
+      </Row>
+
+      {/* App Introduction */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.1, duration: 0.5 }}
+      >
+        <Card 
+          title={<Text style={{ color: colors.textPrimary }}>About Our Platform</Text>}
+          style={{ 
+            marginTop: 24,
+            backgroundColor: theme === 'dark' ? '#1f1f1f' : '#ffffff',
+            borderColor: colors.border
+          }}
+          headStyle={{ borderColor: colors.border }}
+        >
+          <Row gutter={[24, 24]} align="middle">
+            <Col xs={24} md={12}>
+              <Title level={4} style={{ marginBottom: 16, color: colors.textPrimary }}>
+                Your Productivity Powerhouse
+              </Title>
+              <Paragraph style={{ color: colors.textPrimary }}>
+                Our platform is designed to streamline your workflow, enhance collaboration, 
+                and provide actionable insights to boost your productivity.
+              </Paragraph>
+              <Paragraph style={{ color: colors.textPrimary }}>
+                With intuitive tools and real-time analytics, you can focus on what matters most - 
+                achieving your goals and driving results.
+              </Paragraph>
+              <Button type="primary" icon={<RocketOutlined />}>
+                Take the Tour
+              </Button>
+            </Col>
+            <Col xs={24} md={12}>
+              <div style={{ 
+                height: 250,
+                background: theme === 'dark' ? 'rgba(24, 144, 255, 0.05)' : 'rgba(24, 144, 255, 0.1)',
+                borderRadius: 8,
+                border: `1px dashed ${colors.primary}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: colors.primary
+              }}>
+                <Text>Platform Screenshot</Text>
+              </div>
+            </Col>
+          </Row>
+        </Card>
+      </motion.div>
+    </div>
+  );
+};
+
+export default WelcomePage;

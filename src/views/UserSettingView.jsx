@@ -1,31 +1,50 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Drawer, Button, theme } from 'antd';
+import { Layout, Menu, ConfigProvider } from 'antd';
 import { 
-  UserOutlined, 
   TeamOutlined, 
   CalendarOutlined, 
-  TableOutlined,
-  MenuOutlined,
-  CloseOutlined
+  TableOutlined
 } from '@ant-design/icons';
 import EmployeViewComponent from './EmployeViewComponent';
 import UserTable from './UserTable';
 import EventsComponent from './EventsComponent';
 import { Outlet } from 'react-router-dom';
 import VacationComponent from './VacationComponent';
+import { useStateContext } from '../contexts/ContextProvider';
 
 const { Header, Content } = Layout;
-const { useToken } = theme;
 
 function UserSettingView({ onSelectMenuItem }) {
-  const { token } = useToken();
+  const { theme } = useStateContext();
   const [current, setCurrent] = useState('1');
-  const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+
+  // Theme styles
+  const themeStyles = {
+    light: {
+      primary: '#1890ff',
+      bgContainer: '#f5f5f5',
+      textPrimary: '#222222',
+      textSecondary: '#595959',
+      border: '#f0f0f0',
+      headerBg: '#1890ff',
+      white: '#ffffff',
+    },
+    dark: {
+      primary: '#177ddc',
+      bgContainer: '#141414',
+      textPrimary: 'rgba(255, 255, 255, 0.85)',
+      textSecondary: 'rgba(255, 255, 255, 0.45)',
+      border: '#303030',
+      headerBg: '#1f1f1f',
+      white: 'rgba(255, 255, 255, 0.85)',
+    }
+  };
+
+  const colors = themeStyles[theme];
 
   const handleMenuClick = (e) => {
     setCurrent(e.key);
-    setMobileMenuVisible(false);
+    if (onSelectMenuItem) onSelectMenuItem(e.key);
   };
 
   const renderContent = (key) => {
@@ -60,119 +79,81 @@ function UserSettingView({ onSelectMenuItem }) {
   ];
 
   return (
-    <Layout style={{ 
-      background: token.colorBgContainer, 
-      minHeight: '100vh',
-      transition: 'all 0.2s'
-    }}>
-      {/* Desktop Header */}
-      <Header 
-        style={{ 
-          display: { xs: 'none', md: 'flex' },
-          alignItems: 'center', 
-          background: token.colorPrimary, 
-          boxShadow: token.boxShadow,
-          borderRadius: { xs: 0, md: '0 0 12px 12px' },
-          marginBottom: 16,
-          padding: '0 24px',
-          height: 64,
-          position: 'sticky',
-          top: 0,
-          zIndex: 100
-        }}
-      >
-        <Menu
-          onClick={handleMenuClick}
-          theme="dark"
-          mode="horizontal"
-          defaultSelectedKeys={['1']}
-          selectedKeys={[current]}
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: colors.primary,
+          colorBgContainer: colors.bgContainer,
+          colorText: colors.textPrimary,
+          colorBorder: colors.border,
+        },
+      }}
+    >
+      <Layout style={{ 
+        background: colors.bgContainer, 
+        minHeight: '100vh',
+        transition: 'all 0.2s'
+      }}>
+        {/* Header */}
+        <Header 
           style={{ 
-            flex: 1, 
-            minWidth: 0, 
-            background: 'transparent', 
-            fontWeight: 600, 
-            fontSize: 16, 
-            border: 'none',
-            lineHeight: '64px'
+            display: 'flex',
+            alignItems: 'center', 
+            background: colors.headerBg, 
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+            borderRadius: '0 0 12px 12px',
+            marginBottom: 16,
+            padding: '0 24px',
+            height: 64,
+            position: 'sticky',
+            top: 0,
+            zIndex: 100
           }}
-          items={menuItems.map(item => ({
-            ...item,
-            label: <span style={{ color: token.colorWhite }}>{item.label}</span>
-          }))}
-        />
-      </Header>
+        >
+          <Menu
+            onClick={handleMenuClick}
+            theme="dark"
+            mode="horizontal"
+            defaultSelectedKeys={['1']}
+            selectedKeys={[current]}
+            style={{ 
+              flex: 1, 
+              minWidth: 0, 
+              background: 'transparent', 
+              fontWeight: 600, 
+              fontSize: 16, 
+              border: 'none',
+              lineHeight: '64px'
+            }}
+            items={menuItems.map(item => ({
+              ...item,
+              label: <span style={{ color: colors.white }}>{item.label}</span>
+            }))}
+          />
+        </Header>
 
-      {/* Mobile Header */}
-      <Header 
-        style={{ 
-          display: { xs: 'flex', md: 'none' },
-          alignItems: 'center', 
-          justifyContent: 'space-between',
-          background: token.colorPrimary, 
-          boxShadow: token.boxShadow,
-          marginBottom: 16,
-          padding: '0 16px',
-          height: 56,
-          position: 'sticky',
-          top: 0,
-          zIndex: 100
-        }}
-      >
-        <div style={{ color: token.colorWhite, fontWeight: 600, fontSize: 18 }}>
-          {menuItems.find(item => item.key === current)?.label}
-        </div>
-        <Button 
-          type="text" 
-          icon={mobileMenuVisible ? <CloseOutlined /> : <MenuOutlined />}
-          onClick={() => setMobileMenuVisible(!mobileMenuVisible)}
-          style={{ color: token.colorWhite, fontSize: 18 }}
-        />
-      </Header>
-
-      {/* Mobile Menu Drawer */}
-      <Drawer
-        title="Menu"
-        placement="right"
-        closable={false}
-        onClose={() => setMobileMenuVisible(false)}
-        open={mobileMenuVisible}
-        bodyStyle={{ padding: 0 }}
-        headerStyle={{ background: token.colorPrimary, color: token.colorWhite }}
-      >
-        <Menu
-          onClick={handleMenuClick}
-          theme="light"
-          mode="vertical"
-          selectedKeys={[current]}
-          style={{ 
-            borderRight: 0,
-            padding: '8px 0'
+        {/* Content Area */}
+        <Content
+          style={{
+            padding: '24px',
+            margin: 0,
+            minHeight: 280,
           }}
-          items={menuItems}
-        />
-      </Drawer>
-
-      {/* Content Area */}
-      <Content
-        style={{
-          padding: '24px',
-          margin: 0,
-          minHeight: 280,
-        }}
-      >
-        <div style={{
-          background: token.colorBgContainer,
-          borderRadius: token.borderRadiusLG,
-          padding: 24,
-          minHeight: 'calc(100vh - 180px)',
-          boxShadow: token.boxShadowSecondary
-        }}>
-          <Outlet />
-          {renderContent(current)}
-        </div>
-      </Content>
-    </Layout>
+        >
+          <div style={{
+            background: colors.bgContainer,
+            borderRadius: 8,
+            padding: 24,
+            minHeight: 'calc(100vh - 180px)',
+            boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
+            border: `1px solid ${colors.border}`
+          }}>
+            <Outlet />
+            {renderContent(current)}
+          </div>
+        </Content>
+      </Layout>
+    </ConfigProvider>
   );
 }
 

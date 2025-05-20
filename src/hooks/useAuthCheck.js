@@ -7,23 +7,31 @@ export const useAuthCheck = () => {
 
   useEffect(() => {
     const checkAuth = () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('ACCESS_TOKEN'); // Ensure consistent key usage
       const isAuth = !!token;
       setIsAuthenticated(isAuth);
-      
+
       if (!isAuth) {
+        console.warn('User is not authenticated. Redirecting to login.');
         navigate('/login');
       }
     };
 
     checkAuth();
+
     // Add event listener for storage changes
-    window.addEventListener('storage', checkAuth);
-    
+    const handleStorageChange = (event) => {
+      if (event.key === 'ACCESS_TOKEN') {
+        checkAuth();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
     return () => {
-      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, [navigate]);
 
   return isAuthenticated;
-}; 
+};

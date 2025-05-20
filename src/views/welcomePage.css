@@ -1,0 +1,73 @@
+/* Animations */
+.welcome-container {
+  padding: 24px;
+  transition: all 0.3s;
+}
+
+.highlight-text {
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.promo-banner {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.banner-slide {
+  padding: 40px 24px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+}
+
+.quick-action-card {
+  text-align: center;
+  transition: all 0.3s;
+  height: 100%;
+}
+
+.quick-action-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.action-icon {
+  font-size: 32px;
+  transition: all 0.3s;
+}
+
+.quick-action-card:hover .action-icon {
+  transform: scale(1.1);
+}
+
+.app-intro-card {
+  background: linear-gradient(135deg, rgba(24, 144, 255, 0.05) 0%, rgba(24, 144, 255, 0.01) 100%);
+}
+
+.screenshot-mockup {
+  height: 250px;
+  background: rgba(24, 144, 255, 0.1);
+  border-radius: 8px;
+  border: 1px dashed #1890ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1890ff;
+}
+
+/* Dark mode styles */
+.welcome-container.dark .quick-action-card {
+  background: #1f1f1f;
+}
+
+.welcome-container.dark .app-intro-card {
+  background: linear-gradient(135deg, rgba(24, 144, 255, 0.1) 0%, rgba(24, 144, 255, 0.05) 100%);
+}
+
+.welcome-container.dark .screenshot-mockup {
+  background: rgba(24, 144, 255, 0.05);
+  border-color: #177ddc;
+  color: #177ddc;
+}

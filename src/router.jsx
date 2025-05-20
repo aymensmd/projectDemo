@@ -1,10 +1,8 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import Login from './views/Login';
 import NotFound from './views/NotFound';
 import DefaultLayout from './components/DefaultLayout';
-import React from 'react';
 import App from './App';
-import EmployeViewComponent from './views/EmployeViewComponent';
 import Dashboard from './views/Dashboard';
 import UserSettingView from './views/UserSettingView';
 import Unauthorized from './views/Unauthorized';
@@ -12,24 +10,36 @@ import PrivateRoute from './contexts/PrivateRoute';
 import ProfilePage from './views/ProfilePage';
 import MessageComponent from './views/MessageComponent';
 import SettingsPage from './views/SettingsPage';
-
+import WelcomePage from './views/WelcomePage'; // Import WelcomePage
+import React from 'react';
 const router = createBrowserRouter([
   {
+    path: '/login',
+    element: <Login />
+  },
+  {
+    path: '/unauthorized',
+    element: <Unauthorized />
+  },
+  {
     path: '/',
-    element: <DefaultLayout />,
+    element: (
+      <PrivateRoute>
+        <DefaultLayout />
+      </PrivateRoute>
+    ),
     children: [
       {
-        path: '/app',
-        element: (
-          <PrivateRoute allowedRoles={['admin', 'user']}>
-            <App />
-           
-          </PrivateRoute>
-        )
+        index: true,
+        element: <Navigate to="/welcome" replace /> // Redirect root to welcome
       },
       {
-        path: '/users_setting',
-        element: <UserSettingView />
+        path: '/welcome',
+        element: <WelcomePage /> // New welcome route
+      },
+      {
+        path: '/app',
+        element: <App />,
       },
       {
         path: '/dashboard',
@@ -40,25 +50,24 @@ const router = createBrowserRouter([
         element: <ProfilePage />
       },
       {
-        path: '/dash/chat',
-        element: <MessageComponent />
-      },
-      {
         path: '/settings',
         element: <SettingsPage />
       },
-      
+      {
+        path: '/dash/chat',
+        element: <MessageComponent />
+      },
+      // HR Management routes - only visible to admin
+      {
+        path: '/users_setting',
+        element: (
+          <PrivateRoute allowedRoles={['admin']}>
+            <UserSettingView />
+          </PrivateRoute>
+        )
+      },
     ]
   },
-  {
-    path: '/login',
-    element: <Login />
-  },
-  {
-    path: '/unauthorized',
-    element: <Unauthorized />
-  },
-  
   {
     path: '*',
     element: <NotFound />

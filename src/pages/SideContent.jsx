@@ -1,113 +1,143 @@
+// SideContent.js - Updated version
 import React, { useState, useEffect } from 'react';
-import { Card, Divider, List, Input, Avatar } from 'antd';
-import { UserOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Card, List, Input, Avatar, Typography, Divider, Badge, Tag } from 'antd';
+import { UserOutlined, TeamOutlined, BarChartOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const { Search } = Input;
-
-const cardStyle = {
-  height: 300,
-  overflow: 'auto', // Enable scroll when content exceeds the card height
-};
-
-const responsiveCardStyle = {
-  ...cardStyle,
-  width: '100%',
-  maxWidth: 300,
-  margin: '0 auto',
-};
+const { Title, Text } = Typography;
 
 const SideContent = () => {
-  // Define state to store the fetched data and search text
   const [data, setData] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  // Fetch data from the API when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch data from the API endpoint
         const response = await axios.get('http://127.0.0.1:8000/api/employees');
-
-        // Update the state with the fetched data
         setData(response.data);
       } catch (error) {
-        // Handle errors
         console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    // Call the fetchData function
     fetchData();
   }, []);
 
-  // Filter data based on search text
   const filteredData = data.filter(item =>
     item.name.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  return (
-    <div style={{ width: '100%', maxWidth: 300, margin: '0 auto' }}>
-      {/* Search input */}
-      <Search
-        placeholder="Search..."
-        allowClear
-        onChange={e => setSearchText(e.target.value)}
-        style={{ marginBottom: 16 }}
-      />
+  const departmentCount = [...new Set(data.map(d => d.department))].length;
 
-      <Card style={{ padding: '20px', background: '#f0f5ff', borderRadius: 12, boxShadow: '0 2px 8px #e6f0ff', maxHeight: 350, overflow: 'auto' }}>
-        <h3 style={{ color: '#277dfe', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
-          Team
-        </h3>
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Team Card */}
+      <Card
+        loading={loading}
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <TeamOutlined style={{ color: '#1890ff' }} />
+            <Text strong>Team Members</Text>
+          </div>
+        }
+        headStyle={{ borderBottom: 0 }}
+        bodyStyle={{ padding: '0 16px 16px' }}
+        className="side-content-card"
+      >
+        <Search
+          placeholder="Search team members..."
+          allowClear
+          onChange={e => setSearchText(e.target.value)}
+          style={{ marginBottom: '16px' }}
+        />
+        
         <List
-          size='small'
+          size="small"
           itemLayout="horizontal"
           dataSource={filteredData}
           renderItem={(item, index) => (
-            <List.Item key={index} style={{ background: '#f4f8ff', borderRadius: 8, marginBottom: 10, boxShadow: '0 1px 4px #e6f0f0', padding: 12, alignItems: 'flex-start' }}>
+            <List.Item 
+              key={index} 
+              style={{ 
+                padding: '12px',
+                borderRadius: '8px',
+                transition: 'all 0.2s',
+                ':hover': {
+                  background: '#f5f5f5'
+                }
+              }}
+            >
               <List.Item.Meta
                 avatar={
-                  <Avatar style={{ backgroundColor: '#277dfe', fontWeight: 600, fontSize: 18 }}>
-                    {item.name.charAt(0).toUpperCase()}
-                  </Avatar>
+                  <Badge 
+                    dot 
+                    color="#52c41a" 
+                    offset={[-5, 30]}
+                  >
+                    <Avatar 
+                      style={{ 
+                        backgroundColor: '#1890ff', 
+                        fontWeight: 600 
+                      }}
+                    >
+                      {item.name.charAt(0).toUpperCase()}
+                    </Avatar>
+                  </Badge>
                 }
                 title={
-                  <span style={{ color: '#222', fontWeight: 600, fontSize: 15, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {item.name}
-                    <span style={{ color: '#277dfe', fontWeight: 500, fontSize: 11, marginLeft: 6, background: '#e6f0ff', borderRadius: 4, padding: '2px 6px' }}>
-                      {item.department}
-                    </span>
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Text strong>{item.name}</Text>
+                    <Tag color="blue">{item.department}</Tag>
+                  </div>
                 }
                 description={
-                  item.email && (
-                    <div style={{ color: '#888', fontSize: 12, marginTop: 2 }}>{item.email}</div>
-                  )
+                  <Text type="secondary" ellipsis>
+                    {item.email}
+                  </Text>
                 }
               />
             </List.Item>
           )}
         />
       </Card>
-      <Card style={{ ...responsiveCardStyle, marginTop: 10 }}>
-        <h3 style={{ color: '#277dfe', fontWeight: 600 }}>Performance</h3>
-        <Divider />
-        <div style={{ overflow: 'auto', height: '100%' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ fontWeight: 500, color: '#222' }}>
-              Team Members: <span style={{ color: '#277dfe', fontWeight: 700 }}>{data.length}</span>
-            </div>
-            <div style={{ fontWeight: 500, color: '#222' }}>
-              Departments: <span style={{ color: '#faad14', fontWeight: 700 }}>{[...new Set(data.map(d => d.department))].length}</span>
-            </div>
-            <div style={{ fontWeight: 500, color: '#222' }}>
-              Avg. Performance: <span style={{ color: '#52c41a', fontWeight: 700 }}>N/A</span>
-            </div>
-            <div style={{ color: '#888', fontSize: 12 }}>
-              * Performance metrics coming soon.
-            </div>
+
+      {/* Stats Card */}
+      <Card
+        loading={loading}
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <BarChartOutlined style={{ color: '#1890ff' }} />
+            <Text strong>Team Stats</Text>
           </div>
+        }
+        headStyle={{ borderBottom: 0 }}
+        className="side-content-card"
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Text>Team Members</Text>
+            <Text strong>{data.length}</Text>
+          </div>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Text>Departments</Text>
+            <Text strong style={{ color: '#faad14' }}>{departmentCount}</Text>
+          </div>
+          
+          <Divider style={{ margin: '12px 0' }} />
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Text>Avg. Performance</Text>
+            <Text strong style={{ color: '#52c41a' }}>N/A</Text>
+          </div>
+          
+          <Text type="secondary" style={{ fontSize: '12px', marginTop: '8px' }}>
+            Performance metrics coming soon
+          </Text>
         </div>
       </Card>
     </div>
