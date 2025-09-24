@@ -62,7 +62,7 @@ const Banner = ({ userId }) => {
       calculateTotalVacationDays(response.data);
     } catch (error) {
       console.error('Failed to fetch vacations', error);
-      message.error('Failed to fetch vacations');
+    
     }
   };
 

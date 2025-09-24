@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Badge, Button, Card, Drawer, Form, Input, Space, Table, DatePicker, Select, Popconfirm, Typography, Spin, App } from 'antd';
+import {
+  Badge, Button, Card, Drawer, Form, Input, Space, Table,
+  DatePicker, Select, Popconfirm, Typography, Spin, App
+} from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
-import { useStateContext } from '../contexts/ContextProvider'; // Adjust path as needed
+import { useStateContext } from '../contexts/ContextProvider';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -11,12 +14,7 @@ const { Option } = Select;
 dayjs.locale('fr');
 
 const vacationTypes = [
-  'Annuel',
-  'Maladie',
-  'Sans solde',
-  'Maternité',
-  'Paternité',
-  'Autre',
+  'Annuel', 'Maladie', 'Sans solde', 'Maternité', 'Paternité', 'Autre',
 ];
 
 const VacData = ({ setTotalVacationDays }) => {
@@ -40,9 +38,7 @@ const VacData = ({ setTotalVacationDays }) => {
     setLoading(true);
     try {
       const response = await axios.get(`http://127.0.0.1:8000/api/vacations/${user.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.data && Array.isArray(response.data)) {
@@ -87,7 +83,7 @@ const VacData = ({ setTotalVacationDays }) => {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      render: (type) => <span style={{ fontWeight: 500 }}>{type || '-'}</span>,
+      render: (type) => <span style={{ fontWeight: 500 }}>{type?.name || type || '-'}</span>,
     },
     {
       title: 'Raison',
@@ -119,10 +115,9 @@ const VacData = ({ setTotalVacationDays }) => {
             }
             text={record.status || 'Pending'}
           />
-          {record.status === 'Pending' && (
+          {record.status === 'Pending' ? (
             <Button type="link" onClick={() => showUpdateDrawer(record)}>Modifier</Button>
-          )}
-          {record.status !== 'Pending' && (
+          ) : (
             <span style={{ color: 'rgba(0, 0, 0, 0.25)' }}>Non modifiable</span>
           )}
         </Space>
@@ -137,6 +132,7 @@ const VacData = ({ setTotalVacationDays }) => {
       ...vacation,
       start_date: vacation.start_date ? dayjs(vacation.start_date) : null,
       end_date: vacation.end_date ? dayjs(vacation.end_date) : null,
+      type: typeof vacation.type === 'object' ? vacation.type.name : vacation.type,
     });
   };
 
@@ -156,12 +152,10 @@ const VacData = ({ setTotalVacationDays }) => {
           end_date: values.end_date.format('YYYY-MM-DD'),
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-      
+
       message.success('Demande mise à jour avec succès');
       closeUpdateDrawer();
       fetchVacations();
@@ -174,9 +168,7 @@ const VacData = ({ setTotalVacationDays }) => {
   const handleDeleteVacation = async () => {
     try {
       await axios.delete(`http://127.0.0.1:8000/api/vacations/${selectedVacation.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       message.success('Demande supprimée avec succès');
       closeUpdateDrawer();
@@ -202,9 +194,7 @@ const VacData = ({ setTotalVacationDays }) => {
           rowKey={(record) => record.id}
           style={{ marginTop: 16, background: '#fff', borderRadius: 8 }}
           size="middle"
-          locale={{
-            emptyText: 'Aucune demande de vacances trouvée'
-          }}
+          locale={{ emptyText: 'Aucune demande de vacances trouvée' }}
         />
       </Spin>
 
@@ -213,58 +203,54 @@ const VacData = ({ setTotalVacationDays }) => {
         placement="right"
         onClose={closeUpdateDrawer}
         open={updateDrawerVisible}
-        destroyOnClose={true}
+        destroyOnClose
         width={400}
       >
         {selectedVacation && (
-          <Form
-            layout="vertical"
-            form={form}
-            onFinish={handleUpdateFormSubmit}
-          >
-            <Form.Item 
-              name="start_date" 
-              label="Date de début" 
+          <Form layout="vertical" form={form} onFinish={handleUpdateFormSubmit}>
+            <Form.Item
+              name="start_date"
+              label="Date de début"
               rules={[{ required: true, message: 'Veuillez sélectionner une date de début' }]}
             >
-              <DatePicker 
-                style={{ width: '100%' }} 
-                format="DD/MM/YYYY" 
+              <DatePicker
+                style={{ width: '100%' }}
+                format="DD/MM/YYYY"
                 disabledDate={(current) => current && current < dayjs().startOf('day')}
               />
             </Form.Item>
-            
-            <Form.Item 
-              name="end_date" 
-              label="Date de fin" 
+
+            <Form.Item
+              name="end_date"
+              label="Date de fin"
               rules={[
                 { required: true, message: 'Veuillez sélectionner une date de fin' },
-                { validator: validateDates }
+                { validator: validateDates },
               ]}
             >
-              <DatePicker 
-                style={{ width: '100%' }} 
-                format="DD/MM/YYYY" 
+              <DatePicker
+                style={{ width: '100%' }}
+                format="DD/MM/YYYY"
                 disabledDate={(current) => current && current < dayjs().startOf('day')}
               />
             </Form.Item>
-            
-            <Form.Item 
-              name="type" 
-              label="Type" 
+
+            <Form.Item
+              name="type"
+              label="Type"
               rules={[{ required: true, message: 'Veuillez sélectionner un type' }]}
             >
               <Select placeholder="Sélectionner le type">
-                {vacationTypes.map(type => (
+                {vacationTypes.map((type) => (
                   <Option key={type} value={type}>{type}</Option>
                 ))}
               </Select>
             </Form.Item>
-            
+
             <Form.Item name="reason" label="Raison">
               <Input.TextArea rows={2} placeholder="Raison du congé" />
             </Form.Item>
-            
+
             <Form.Item>
               <Space>
                 <Button type="primary" htmlType="submit">Modifier</Button>

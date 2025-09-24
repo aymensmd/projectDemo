@@ -6,7 +6,18 @@ import {
   UserOutlined,
   SettingOutlined,
   MessageOutlined,
-  LogoutOutlined
+  LogoutOutlined,
+  ProjectOutlined,
+  CalendarOutlined,
+  BellOutlined,
+  BarChartOutlined,
+  PieChartOutlined,
+  QuestionCircleOutlined,
+  BookOutlined,
+  ClockCircleOutlined,
+  FormOutlined,
+  GiftOutlined,
+  ApartmentOutlined
 } from '@ant-design/icons';
 import { Menu, Spin } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -60,6 +71,18 @@ const Sidebar = () => {
       getItem('Dashboard', '/dashboard', <WindowsOutlined />),
       getItem('Profile', '/profile', <UserOutlined />),
       getItem('Settings', '/settings', <SettingOutlined />),
+  // Future features
+  getItem('Projects', '/projects', <ProjectOutlined />),
+  getItem('Calendar', '/calendar', <CalendarOutlined />),
+  getItem('Notifications', '/notifications', <BellOutlined />),
+  getItem('Reports', '/reports', <BarChartOutlined />),
+  getItem('Analytics', '/analytics', <PieChartOutlined />),
+  getItem('Help Center', '/help', <QuestionCircleOutlined />),
+  getItem('Knowledge Base', '/knowledge', <BookOutlined />),
+  getItem('Time Tracking', '/timetracking', <ClockCircleOutlined />),
+  getItem('Surveys', '/surveys', <FormOutlined />),
+  getItem('Rewards', '/rewards', <GiftOutlined />),
+  getItem('Workflow Builder', 'workflow-builder', <ApartmentOutlined />),
     ];
 
     if (user?.role?.name?.toLowerCase() === 'admin') {

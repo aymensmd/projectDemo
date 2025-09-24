@@ -7,17 +7,20 @@ import {
   TeamOutlined, UserOutlined, DashboardOutlined, MessageOutlined, 
   SettingOutlined, CalendarOutlined, RocketOutlined, 
   TrophyOutlined, CheckCircleOutlined, StarOutlined,
-  ArrowRightOutlined, NotificationOutlined, ProjectOutlined
+  ArrowRightOutlined, NotificationOutlined, ProjectOutlined,
+  FileTextOutlined, CloudUploadOutlined, VideoCameraOutlined, CustomerServiceOutlined, InfoCircleOutlined
 } from '@ant-design/icons';
 import { useStateContext } from '../contexts/ContextProvider';
 import { motion } from 'framer-motion';
 import CountUp from 'react-countup';
 import './welcomePage.css';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text, Paragraph } = Typography;
 
 const WelcomePage = () => {
   const { user, theme } = useStateContext();
+  const navigate = useNavigate();
   const [activeSlide, setActiveSlide] = useState(0);
   const [stats, setStats] = useState(null);
 
@@ -112,6 +115,25 @@ const WelcomePage = () => {
     motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)]
   );
 
+  const quickTools = [
+    { icon: <FileTextOutlined />, label: 'HR Policies', path: '/hr-policies' },
+    { icon: <CloudUploadOutlined />, label: 'Upload Documents', path: '/upload' },
+    { icon: <VideoCameraOutlined />, label: 'Video Meetings', path: '/meetings' },
+    { icon: <CustomerServiceOutlined />, label: 'Support', path: '/support' },
+  ];
+
+  const newsItems = [
+    { title: 'New Feature: Time Tracking', date: '2025-09-20', desc: 'Track your work hours and productivity with our new time tracking tool.' },
+    { title: 'Holiday Policy Update', date: '2025-09-10', desc: 'Check out the updated holiday and leave policies for 2025.' },
+    { title: 'Wellness Webinar', date: '2025-09-05', desc: 'Join our upcoming wellness webinar for tips on work-life balance.' },
+  ];
+
+  const resourceLinks = [
+    { icon: <InfoCircleOutlined />, label: 'Employee Handbook', url: '/handbook.pdf' },
+    { icon: <FileTextOutlined />, label: 'Company News', url: '/news' },
+    { icon: <CustomerServiceOutlined />, label: 'Contact HR', url: '/contact-hr' },
+  ];
+
   return (
     <div className={`welcome-container ${theme}`} style={{ backgroundColor: theme === 'dark' ? '#141414' : '#f5f5f5' }}>
       {/* Animated Banner */}
@@ -133,7 +155,8 @@ const WelcomePage = () => {
           level={3} 
           style={{ 
             color: theme === 'dark' ? 'white' : 'rgba(0, 0, 0, 0.85)', // Black for light theme
-            marginBottom: 8 
+            marginBottom: 8 ,
+            
           }}
         >
           {item.title}
@@ -146,6 +169,7 @@ const WelcomePage = () => {
           shape="round" 
           style={{ 
             marginTop: 16,
+            marginLeft: 30,
             backgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : undefined,
             color: theme === 'dark' ? 'white' : undefined
           }}
@@ -430,6 +454,99 @@ const WelcomePage = () => {
           </Row>
         </Card>
       </motion.div>
+
+      {/* Hero Section */}
+      <motion.section
+        initial={{ opacity: 0, y: -40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        style={{ padding: '64px 0 32px 0', textAlign: 'center' }}
+      >
+        <img src="src\assets\comunikcrm.png" alt="Company Logo" style={{ width: 100, marginBottom: 16}} />
+        <Title level={1} style={{ color: '#277dfe', fontWeight: 700, marginBottom: 0 }}>
+          Empowering Teams, <span style={{ color: '#52c41a' }}>Transforming Work</span>
+        </Title>
+        <Paragraph style={{ fontSize: 20, maxWidth: 600, margin: '16px auto 32px', color: '#555' }}>
+          At <b>Comunik</b>, our mission is to streamline HR processes, foster collaboration, and drive business success through innovative digital solutions.
+        </Paragraph>
+        <Button type="primary" size="large" style={{ fontWeight: 600, boxShadow: '0 2px 8px #277dfe33' }} onClick={() => navigate('/dashboard')}>
+          Get Started
+        </Button>
+      </motion.section>
+
+      {/* Call to Action */}
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.3 }}
+        style={{ maxWidth: 900, margin: '40px auto 0', background: '#e6f7ff', borderRadius: 16, boxShadow: '0 2px 16px #0001', padding: 32, textAlign: 'center' }}
+      >
+        <Title level={3} style={{ color: '#277dfe', marginBottom: 16 }}>Ready to Transform Your HR Experience?</Title>
+        <Paragraph style={{ fontSize: 17, color: '#555', marginBottom: 24 }}>
+          Join hundreds of organizations who trust <b>Comunik</b> to power their HR operations and employee engagement.
+        </Paragraph>
+        <Button type="primary" size="large" style={{ fontWeight: 600, boxShadow: '0 2px 8px #277dfe33' }} onClick={() => navigate('/demo_request')}>
+          Request a Demo
+        </Button>
+      </motion.section>
+
+      {/* Quick Tools Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.4 }}
+        style={{ maxWidth: 900, margin: '40px auto 0', background: '#fff', borderRadius: 16, boxShadow: '0 2px 16px #0001', padding: 32 }}
+      >
+        <Title level={3} style={{ color: '#277dfe', marginBottom: 24 }}>Quick Tools</Title>
+        <Row gutter={[16, 16]}>
+          {quickTools.map(tool => (
+            <Col xs={12} sm={6} key={tool.label}>
+              <Card hoverable bordered={false} style={{ textAlign: 'center', borderRadius: 12, minHeight: 120 }} onClick={() => navigate(tool.path)}>
+                <div style={{ fontSize: 32, marginBottom: 8, color: '#277dfe' }}>{tool.icon}</div>
+                <Text>{tool.label}</Text>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </motion.section>
+
+      {/* News Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.5 }}
+        style={{ maxWidth: 900, margin: '40px auto 0', background: '#f0f5ff', borderRadius: 16, boxShadow: '0 2px 16px #0001', padding: 32 }}
+      >
+        <Title level={3} style={{ color: '#1890ff', marginBottom: 24 }}>Latest News & Updates</Title>
+        <ul style={{ padding: 0, listStyle: 'none' }}>
+          {newsItems.map(item => (
+            <li key={item.title} style={{ marginBottom: 18 }}>
+              <Text strong>{item.title}</Text> <Text type="secondary" style={{ marginLeft: 8 }}>{item.date}</Text>
+              <Paragraph style={{ margin: 0 }}>{item.desc}</Paragraph>
+            </li>
+          ))}
+        </ul>
+      </motion.section>
+
+      {/* Resources Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.6 }}
+        style={{ maxWidth: 900, margin: '40px auto 32px', background: '#fff', borderRadius: 16, boxShadow: '0 2px 16px #0001', padding: 32 }}
+      >
+        <Title level={3} style={{ color: '#52c41a', marginBottom: 24 }}>Resources</Title>
+        <Row gutter={[16, 16]}>
+          {resourceLinks.map(link => (
+            <Col xs={24} sm={8} key={link.label}>
+              <Card hoverable bordered={false} style={{ textAlign: 'center', borderRadius: 12, minHeight: 100 }} onClick={() => window.open(link.url, '_blank')}>
+                <div style={{ fontSize: 28, marginBottom: 8, color: '#52c41a' }}>{link.icon}</div>
+                <Text>{link.label}</Text>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </motion.section>
     </div>
   );
 };

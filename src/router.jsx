@@ -11,6 +11,18 @@ import ProfilePage from './views/ProfilePage';
 import MessageComponent from './views/MessageComponent';
 import SettingsPage from './views/SettingsPage';
 import WelcomePage from './views/WelcomePage'; // Import WelcomePage
+import DemoRequest from './views/DemoRequest'; // Import DemoRequest
+import Projects from './views/Projects';
+import Calendar from './views/Calendar';
+import Notifications from './views/Notifications';
+import Reports from './views/Reports';
+import Analytics from './views/Analytics';
+import HelpCenter from './views/HelpCenter';
+import KnowledgeBase from './views/KnowledgeBase';
+import TimeTracking from './views/TimeTracking';
+import Surveys from './views/Surveys';
+import Rewards from './views/Rewards';
+import WorkflowBuilder from './views/WorkflowBuilder'; // Import WorkflowBuilder
 import React from 'react';
 const router = createBrowserRouter([
   {
@@ -56,6 +68,54 @@ const router = createBrowserRouter([
       {
         path: '/dash/chat',
         element: <MessageComponent />
+      },
+      {
+        path: '/demo-request',
+        element: <DemoRequest />
+      },
+      {
+        path: '/projects',
+        element: <Projects />
+      },
+      {
+        path: '/calendar',
+        element: <Calendar />
+      },
+      {
+        path: '/notifications',
+        element: <Notifications />
+      },
+      {
+        path: '/reports',
+        element: <Reports />
+      },
+      {
+        path: '/analytics',
+        element: <Analytics />
+      },
+      {
+        path: '/help',
+        element: <HelpCenter />
+      },
+      {
+        path: '/knowledge',
+        element: <KnowledgeBase />
+      },
+      {
+        path: '/timetracking',
+        element: <TimeTracking />
+      },
+      {
+        path: '/surveys',
+        element: <Surveys />
+      },
+      {
+        path: '/rewards',
+        element: <Rewards />
+      },
+      {
+        path: '/workflow-builder',
+        element: <WorkflowBuilder /> // New WorkflowBuilder route
       },
       // HR Management routes - only visible to admin
       {
