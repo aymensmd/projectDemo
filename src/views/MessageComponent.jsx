@@ -396,7 +396,7 @@ const MessageComponent = () => {
               icon={<MenuOutlined />} 
               onClick={() => setMobileMenuVisible(true)}
               className="mobile-menu-button"
-              style={{ display: { xs: 'block', md: 'none' }, marginRight: 16 }}
+              style={{ marginRight: 16 }}
             />
             
             <Avatar 
@@ -453,55 +453,69 @@ const MessageComponent = () => {
           }}
         >
           <div style={{ maxWidth: 800, margin: '0 auto', width: '100%' }}>
-            <List
-              dataSource={currentMessages}
-              renderItem={(item) => (
-                <List.Item 
-                  style={{ 
-                    padding: '4px 0',
-                    justifyContent: item.sender === '1' ? 'flex-end' : 'flex-start'
-                  }}
-                >
-                  <div 
-                    style={{
-                      maxWidth: '80%',
-                      minWidth: '120px',
-                      position: 'relative'
-                    }}
-                  >
-                    <div 
-                      style={{
-                        background: item.sender === '1' ? '#1890ff' : '#fff',
-                        color: item.sender === '1' ? '#fff' : '#333',
-                        padding: '12px 16px',
-                        borderRadius: item.sender === '1' ? '18px 18px 0 18px' : '18px 18px 18px 0',
-                        boxShadow: '0 1px 2px rgba(0,0,0,0.08)',
-                        wordBreak: 'break-word',
-                        position: 'relative'
-                      }}
-                    >
-                      {item.text}
-                      
-                      <div style={{ 
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        alignItems: 'center',
-                        marginTop: 4,
-                        fontSize: 11,
-                        color: item.sender === '1' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.45)'
-                      }}>
-                        {dayjs(item.timestamp).format('h:mm A')}
-                        {item.sender === '1' && (
-                          <span style={{ marginLeft: 4 }}>
-                            {getMessageStatusIcon(item)}
+              <List
+                dataSource={currentMessages}
+                renderItem={(item, idx) => {
+                  const isMine = item.sender === '1';
+                  const prev = currentMessages[idx - 1];
+                  const showDate = !prev || !dayjs(item.timestamp).isSame(prev.timestamp, 'day');
+
+                  return (
+                    <div style={{ width: '100%' }}>
+                      {showDate && (
+                        <div style={{ textAlign: 'center', margin: '12px 0' }}>
+                          <span style={{ background: '#f0f2f5', padding: '6px 12px', borderRadius: 16, fontSize: 12, color: '#666' }}>
+                            {dayjs(item.timestamp).format('MMMM D, YYYY')}
                           </span>
+                        </div>
+                      )}
+
+                      <List.Item
+                        style={{
+                          padding: '8px 0',
+                          display: 'flex',
+                          justifyContent: isMine ? 'flex-end' : 'flex-start',
+                          alignItems: 'flex-end'
+                        }}
+                      >
+                        {!isMine && (
+                          <div style={{ marginRight: 12 }}>
+                            <Avatar size={36} style={{ backgroundColor: '#1890ff', fontWeight: 600 }}>{selectedUser.avatar}</Avatar>
+                          </div>
                         )}
-                      </div>
+
+                        <div className={`message-bubble ${isMine ? 'message-bubble-sent' : 'message-bubble-received'}`}>
+                          <div style={{ whiteSpace: 'pre-wrap' }}>{item.text}</div>
+                          <div className="message-time" style={{ marginTop: 6 }}>
+                            <span>{dayjs(item.timestamp).format('h:mm A')}</span>
+                            {isMine && (
+                              <span style={{ marginLeft: 6 }}>{getMessageStatusIcon(item)}</span>
+                            )}
+                          </div>
+                        </div>
+
+                        {isMine && (
+                          <div style={{ marginLeft: 12, width: 36 }} />
+                        )}
+                      </List.Item>
                     </div>
+                  );
+                }}
+              />
+
+              {/* Typing indicator */}
+              {isTyping && (
+                <div style={{ display: 'flex', justifyContent: 'flex-start', padding: '6px 0' }}>
+                  <div style={{ marginRight: 12 }}>
+                    <Avatar size={36} style={{ backgroundColor: '#1890ff', fontWeight: 600 }}>{selectedUser.avatar}</Avatar>
                   </div>
-                </List.Item>
+                  <div className="typing-indicator" style={{ background: '#fff', padding: '8px 12px', borderRadius: 18, boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>
+                    <div className="typing-dot" />
+                    <div className="typing-dot" />
+                    <div className="typing-dot" />
+                  </div>
+                </div>
               )}
-            />
             <div ref={messagesEndRef} />
           </div>
         </Content>

@@ -14,6 +14,7 @@ import { useStateContext } from '../contexts/ContextProvider';
 import { motion } from 'framer-motion';
 import CountUp from 'react-countup';
 import './welcomePage.css';
+import logo from '../assets/comunikcrm.png';
 import { useNavigate } from 'react-router-dom';
 
 const { Title, Text, Paragraph } = Typography;
@@ -330,31 +331,33 @@ const WelcomePage = () => {
               }}
               headStyle={{ borderColor: colors.border }}
             >
-              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <div className="feature-grid">
                 {features.map((feature, index) => (
                   <Card 
                     key={index} 
                     size="small" 
                     hoverable
+                    className="feature-card"
                     style={{
                       backgroundColor: colors.cardBg,
-                      borderColor: colors.border
+                      borderColor: colors.border,
+                      width: '100%'
                     }}
                   >
-                    <Row align="middle" gutter={12}>
-                      <Col>{feature.icon}</Col>
-                      <Col flex="auto">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}> 
+                      <div style={{ fontSize: 24, color: colors.primary }}>{feature.icon}</div>
+                      <div style={{ flex: 1 }}>
                         <Text strong style={{ color: colors.textPrimary }}>{feature.title}</Text>
                         <br />
                         <Text type="secondary" style={{ color: colors.textSecondary }}>{feature.description}</Text>
-                      </Col>
-                      <Col>
+                      </div>
+                      <div>
                         <Button type="text" icon={<ArrowRightOutlined />} />
-                      </Col>
-                    </Row>
+                      </div>
+                    </div>
                   </Card>
                 ))}
-              </Space>
+              </div>
             </Card>
           </motion.div>
         </Col>
@@ -462,7 +465,7 @@ const WelcomePage = () => {
         transition={{ duration: 0.8 }}
         style={{ padding: '64px 0 32px 0', textAlign: 'center' }}
       >
-        <img src="src\assets\comunikcrm.png" alt="Company Logo" style={{ width: 100, marginBottom: 16}} />
+  <img src={logo} alt="Company Logo" style={{ width: 100, maxWidth: '40%', height: 'auto', marginBottom: 16}} />
         <Title level={1} style={{ color: '#277dfe', fontWeight: 700, marginBottom: 0 }}>
           Empowering Teams, <span style={{ color: '#52c41a' }}>Transforming Work</span>
         </Title>

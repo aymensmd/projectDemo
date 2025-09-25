@@ -7,6 +7,27 @@
   margin: 0 auto;
 }
 
+/* Fixed sider helpers: match the JS-side widths (collapsed 80, expanded 200) */
+.sider {
+  transition: width 0.18s ease, left 0.18s ease;
+}
+.sider[aria-hidden="false"], .sider:not(.ant-layout-sider-collapsed) {
+  width: 200px !important;
+}
+.sider.ant-layout-sider-collapsed {
+  width: 80px !important;
+}
+
+/* Hide scrollbar visually for the sidebar but keep scrolling functional */
+.responsive-sidebar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.responsive-sidebar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 /* Dashboard Header */
 .dashboard-header {
   margin-bottom: 32px;

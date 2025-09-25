@@ -14,6 +14,7 @@ export default function DefaultLayout() {
   const [collapsed, setCollapsed] = useState(true);
   const [selectedMenuItem, setSelectedMenuItem] = useState('users_setting');
   const { theme } = useStateContext();
+  const siderWidth = collapsed ? 80 : 200;
 
   return (
     <ConfigProvider
@@ -22,7 +23,7 @@ export default function DefaultLayout() {
       }}
     >
       <Layout 
-        style={{ minHeight: '100vh', }}
+        style={{ minHeight: '100vh' }}
         className={theme === 'dark' ? 'dark-theme' : ''}
       >
         <Sider
@@ -31,6 +32,15 @@ export default function DefaultLayout() {
           collapsible
           collapsed={collapsed}
           className="sider"
+          style={{
+            position: 'fixed',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            height: '100vh',
+            overflow: 'auto',
+            zIndex: 1000,
+          }}
         >
           <div className="logo" />
           <Button
@@ -64,7 +74,7 @@ export default function DefaultLayout() {
           />
           <Sidebar onSelectMenuItem={setSelectedMenuItem} />
         </Sider>
-        <Layout>
+        <Layout style={{ marginLeft: siderWidth, transition: 'margin-left 0.18s' }}>
           <CustomHeader />
           <Content 
             style={{ 

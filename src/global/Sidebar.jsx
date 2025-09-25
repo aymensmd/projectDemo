@@ -112,11 +112,12 @@ const Sidebar = () => {
         height: '100%',
         overflowY: 'auto',
         maxWidth: '100%',
-        padding: '8px',
-        position: 'absolute',
-        top: 80,
-        left: 0,
-        bottom: 0,
+        paddingTop: '64px', /* space for the trigger button / logo area */
+        paddingLeft: '8px',
+      
+        paddingRight: '8px',
+        boxSizing: 'border-box',
+        position: 'relative',
       }}
       className="responsive-sidebar"
     />

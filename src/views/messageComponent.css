@@ -77,6 +77,8 @@
     min-width: 120px;
     position: relative;
     transition: all 0.2s;
+    padding: 10px 14px;
+    box-shadow: 0 6px 18px rgba(23, 43, 77, 0.06);
   }
   
   .message-bubble-sent {
@@ -159,6 +161,7 @@
     display: flex;
     padding: 8px 16px;
     align-items: center;
+    gap: 6px;
   }
   
   .typing-dot {
@@ -197,6 +200,8 @@
     
     .mobile-menu-button {
       display: block !important;
+      border: none;
+      background: transparent;
     }
     
     .message-bubble {
@@ -218,4 +223,13 @@
   [data-theme='dark'] .messages-container {
     background-image: none !important;
     background-color: var(--bg-secondary) !important;
+  }
+
+  /* Date badge */
+  .date-badge {
+    background: rgba(0,0,0,0.03);
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    color: #666;
   }
