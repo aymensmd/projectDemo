@@ -1,9 +1,10 @@
 import React from 'react';
-import { Form, Input, Button, message } from 'antd';
+import { Form, Input, Button, message, Select } from 'antd';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { ConfigProvider, Card } from 'antd';
 
+const { Option } = Select;
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ export default function SignUp() {
         email: values.email,
         password: values.password,
         password_confirmation: values.password_confirmation,
+        genre: values.genre,
       });
 
       console.log('Registration successful', response.data);
@@ -93,6 +95,22 @@ export default function SignUp() {
           ]}
         >
           <Input />
+        </Form.Item>
+
+        <Form.Item
+          label="Gender"
+          name="genre"
+          rules={[
+            {
+              required: true,
+              message: 'Please select your gender!',
+            },
+          ]}
+        >
+          <Select>
+            <Option value="Male">Male</Option>
+            <Option value="Female">Female</Option>
+          </Select>
         </Form.Item>
 
         <Form.Item

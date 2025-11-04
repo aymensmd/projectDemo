@@ -1,82 +1,49 @@
-  import React, { useState } from 'react';
-  import Layout from 'antd/es/layout/layout';
-  import { Button, Flex, Card } from 'antd';
-  import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-  import CustomHeader from './global/CustomHeader';
-  import Sidebar from './global/Sidebar';
-  import './app.css'; 
-  const { Sider, Header, Content } = Layout;
-  import Dashbboard from './views/Dashboard'
-  import UserSettingView from './views/UserSettingView';
+import React, { useState, useEffect } from 'react';
+import { Layout, Button } from 'antd';
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import CustomHeader from './global/CustomHeader';
+import Sidebar from './global/Sidebar';
+import './app.css';
+import { Outlet } from 'react-router-dom';
+import { useStateContext } from './contexts/ContextProvider';
+import { ConfigProvider, theme as antdTheme } from 'antd';
+import WelcomePage from './views/WelcomePage';
+const { Header, Content, Footer, Sider } = Layout;
 
-  const DashboardContent = () => (
-    <div>
-      <Dashbboard />
-    </div>
+const App = () => {
+  const [collapsed, setCollapsed] = useState(true);
+  const { theme } = useStateContext();
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
+  }, [theme]);
+
+  return (
+    <ConfigProvider
+      theme={{
+        algorithm: theme === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+      }}
+    >
+
+      
+      <Layout style={{ minHeight: '100vh' }} className={theme === 'dark' ? 'dark-theme' : ''}>
+       
+          <Content className="content-container">
+            <div className="content-wrapper">
+              <Outlet /> {/* This will render the matched child route */}
+            </div>
+          </Content>
+          
+
+         
+        </Layout>
+    
+    </ConfigProvider>
   );
-  const UserSetting = () => (
-    <div>
-      <UserSettingView />
-    </div>
-  );
+};
 
-  const MessagesContent = () => (
-    <div>
-      <Card >
-  condidature table here
-      </Card>
-    </div>
-  );
-
-  const App = () => {
-    const [collapsed, setCollapsed] = useState(true);
-    const [selectedMenuItem, setSelectedMenuItem] = useState('dashboard1');
-
-    const renderContent = () => {
-      switch (selectedMenuItem) {
-        case 'dashboard1':
-          return <DashboardContent />;
-        // Add more cases for other menu items
-        case 'Condidature':
-          return <MessagesContent />;
-        case 'Messages':
-          return <MessagesContent />;
-        case 'users_setting':
-          return <UserSetting />;
-        default:
-          return null;
-      }
-    };
-
-    return (
-      <Layout style={{ minHeight: '100vh' }}>
-        <>
-          <Sider
-            theme="light"
-            trigger={null}
-            collapsible
-            collapsed={collapsed}
-            className="sider"
-          >
-            <Sidebar onSelectMenuItem={setSelectedMenuItem} />
-            <Button
-              type='text'
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setCollapsed(!collapsed)}
-              className="triger-btn"
-            />
-          </Sider>
-          <Layout>
-            <Header className="header">
-              <CustomHeader />
-            </Header>
-            <Content className="content">
-              {renderContent()}
-            </Content>
-          </Layout>
-        </>
-      </Layout>
-    );
-  };
-
-  export default App;
+export default App;

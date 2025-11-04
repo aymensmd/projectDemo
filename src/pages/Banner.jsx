@@ -1,36 +1,171 @@
-import { Button, Card, Drawer, Flex, Typography } from 'antd';
-import React, { useState } from 'react';
+import { Button, Card, Drawer, Typography, Flex, message } from 'antd';
+import React, { useState, useEffect } from 'react';
+import CongeForm from '../Form/CongeForm';
+import VacData from '../data/VacData';
+import axios from 'axios';
+import { useStateContext } from '../contexts/ContextProvider';
 
-const Banner = () => {
-  const [someBooleanValue, setDrawerVisible] = useState(false);
+const { Title, Text } = Typography;
 
-  const showDrawer = () => {
-    setDrawerVisible(true);
+const Banner = ({ userId }) => {
+  const { theme } = useStateContext();
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [secondDrawerVisible, setSecondDrawerVisible] = useState(false);
+  const [vacationDays, setVacationDays] = useState(0);
+
+  // Theme configuration
+  const themeColors = {
+    light: {
+      cardBg: '#ffffff',
+      textPrimary: '#000000',
+      textSecondary: '#595959',
+      primary: '#1890ff',
+      secondaryBg: '#f0f5ff',
+      border: '#d9d9d9',
+      buttonBg: '#fafafa',
+    },
+    dark: {
+      cardBg: '#1f1f1f',
+      textPrimary: 'rgba(255, 255, 255, 0.85)',
+      textSecondary: 'rgba(255, 255, 255, 0.45)',
+      primary: '#177ddc',
+      secondaryBg: '#111b26',
+      border: '#303030',
+      buttonBg: '#1d1d1d',
+    }
   };
 
-  const closeDrawer = () => {
-    setDrawerVisible(false);
+  const colors = themeColors[theme];
+
+  useEffect(() => {
+    fetchVacations();
+    const interval = setInterval(fetchVacations, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchVacations = async () => {
+    try {
+      const token = localStorage.getItem('ACCESS_TOKEN');
+      const userId = localStorage.getItem('USER_ID');
+
+      if (!token) {
+        message.error('User is not authenticated');
+        return;
+      }
+
+      const response = await axios.get(`http://127.0.0.1:8000/api/vacations/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      calculateTotalVacationDays(response.data);
+    } catch (error) {
+      console.error('Failed to fetch vacations', error);
+    
+    }
   };
+
+  const calculateTotalVacationDays = (vacations) => {
+    let totalDays = 0;
+    vacations
+      .filter(vacation => vacation.status === 'Approuvé')
+      .forEach(vacation => {
+        const startDate = new Date(vacation.start_date);
+        const endDate = new Date(vacation.end_date);
+        const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+        totalDays += days;
+      });
+    setVacationDays(totalDays);
+  };
+
+  const showDrawer = () => setDrawerVisible(true);
+  const closeDrawer = () => setDrawerVisible(false);
+  const showSecondDrawer = () => setSecondDrawerVisible(true);
+  const closeSecondDrawer = () => setSecondDrawerVisible(false);
 
   return (
     <>
-      <Card style={{ height: 260, padding: '20px' }}>
-        <Flex vertical gap='30px'>
-          <Flex vertical align="flex-start">
-            <Typography.Title level={2} strong>
-              something here
-            </Typography.Title>
-            <Typography.Text type="secondary" strong>
-              some actioné
-            </Typography.Text>
+      <Card 
+        style={{ 
+          padding: '20px',
+          borderRadius: '10px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          marginBottom: '20px',
+          backgroundColor: colors.cardBg,
+          borderColor: colors.border
+        }}
+      >
+        <Flex justify="space-between" align="center" wrap="wrap" gap={16}>
+          <Flex vertical align="flex-start" style={{ flex: 1, minWidth: 250 }}>
+            <Title 
+              level={2} 
+              style={{ 
+                color: colors.primary, 
+                fontWeight: 'bold',
+                marginBottom: 8
+              }}
+            >
+              Demande de congé
+            </Title>
+            <Text 
+              type="secondary" 
+              style={{ 
+                fontSize: '16px',
+                color: colors.textSecondary
+              }}
+            >
+              Faire une demande de congé
+            </Text>
+            <Flex gap={16} style={{ marginTop: '20px' }}>
+              <Button 
+                type="primary" 
+                size="large" 
+                style={{ 
+                  borderRadius: '5px',
+                  backgroundColor: colors.primary
+                }} 
+                onClick={showDrawer}
+              >
+                Demande
+              </Button>
+              <Button 
+                size="large" 
+                style={{ 
+                  borderRadius: '5px',
+                  backgroundColor: colors.buttonBg,
+                  borderColor: colors.border,
+                  color: colors.textPrimary
+                }} 
+                onClick={showSecondDrawer}
+              >
+                Consulter votre demande
+              </Button>
+            </Flex>
           </Flex>
-          <Flex gap="1rem">
-            <Button type='primary' size='large' onClick={showDrawer}>
-              Demande
-            </Button>
-            
-            <Button size='large'>Consulter ou modifier votre demande </Button>
-          </Flex>
+          
+          <Card
+            style={{
+              width: 130,
+              height: 130,
+              textAlign: 'center',
+              boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              borderRadius: '10px',
+              backgroundColor: colors.secondaryBg,
+              borderColor: colors.border
+            }}
+            bordered
+          >
+            <Title level={4} style={{ color: colors.primary, marginBottom: 8 }}>
+              {vacationDays} / 25
+            </Title>
+            <Text style={{ fontSize: '14px', color: colors.textSecondary }}>
+              Jours par an
+            </Text>
+          </Card>
         </Flex>
       </Card>
 
@@ -38,15 +173,41 @@ const Banner = () => {
         title="Faire une demande de congé"
         placement="right"
         onClose={closeDrawer}
-        open={someBooleanValue}
-       
+        open={drawerVisible}
+        width={700}
+        styles={{
+          body: {
+            backgroundColor: colors.cardBg,
+            color: colors.textPrimary
+          },
+          header: {
+            backgroundColor: colors.cardBg,
+            borderBottomColor: colors.border
+          }
+        }}
       >
-        {/* Content of the drawer */}
-        
+        <CongeForm />
       </Drawer>
-      <Card style={{ height: 325, padding: '20px' }}>
-        
-      </Card>
+
+      <Drawer
+        title="Consulter ou modifier votre demande"
+        placement="right"
+        onClose={closeSecondDrawer}
+        open={secondDrawerVisible}
+        width={900}
+        styles={{
+          body: {
+            backgroundColor: colors.cardBg,
+            color: colors.textPrimary
+          },
+          header: {
+            backgroundColor: colors.cardBg,
+            borderBottomColor: colors.border
+          }
+        }}
+      >
+        <VacData setTotalVacationDays={setVacationDays} />
+      </Drawer>
     </>
   );
 };

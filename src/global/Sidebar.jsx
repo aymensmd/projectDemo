@@ -1,6 +1,27 @@
-import React, { useState } from 'react';
-import { WindowsOutlined,UsergroupAddOutlined, ProfileOutlined, FormOutlined, MessageOutlined,UserOutlined, SettingOutlined } from '@ant-design/icons';
-import { Flex, Menu } from 'antd';
+import React, { useState, useEffect } from 'react';
+import {
+  HomeOutlined,
+  WindowsOutlined,
+  UsergroupAddOutlined,
+  UserOutlined,
+  SettingOutlined,
+  MessageOutlined,
+  LogoutOutlined,
+  ProjectOutlined,
+  CalendarOutlined,
+  BellOutlined,
+  BarChartOutlined,
+  PieChartOutlined,
+  QuestionCircleOutlined,
+  BookOutlined,
+  ClockCircleOutlined,
+  FormOutlined,
+  GiftOutlined,
+  ApartmentOutlined
+} from '@ant-design/icons';
+import { Menu, Spin } from 'antd';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useStateContext } from '../contexts/ContextProvider';
 
 function getItem(label, key, icon, children, type) {
   return {
@@ -12,53 +33,95 @@ function getItem(label, key, icon, children, type) {
   };
 }
 
-const items = [
-  getItem('Dashboard', 'dashboard1', <WindowsOutlined />),
-  getItem('Chat', 'chat', <MessageOutlined />),
-  getItem('Ressources humains', 'HR member', <UsergroupAddOutlined />, [
-    getItem('Gestion des employés', 'group', null, [getItem('Gestion des profiles', 'users_setting',<UserOutlined />), getItem('Gestion des congés', '2')], 'group'),
-   
-  ]),
-  getItem('Navigation ', 'sub2', <ProfileOutlined />, [
-    getItem('Option 5', '5'),
-    getItem('Option 6', '6'),
-    getItem('Submenu', 'sub3', null, [getItem('Option 7', '7'), getItem('Option 8', '8')]),
-  ]),
-  getItem('Condidature', 'Condidature', <FormOutlined />),
-  {
-    type: 'divider',
-  },
-  getItem('Navigation Three', 'sub4', <SettingOutlined />, [
-    getItem('Setting', '9'),
-    getItem('Log Out', '10'),
-  ]),
-];
+const Sidebar = () => {
+  const { user, logout } = useStateContext();
+  const location = useLocation();
+  const [loggingOut, setLoggingOut] = useState(false);
+  const navigate = useNavigate();
+  const [current, setCurrent] = useState(location.pathname);
 
-function Sidebar({ onSelectMenuItem }) {
-  const [current, setCurrent] = useState('1');
+  useEffect(() => {
+    setCurrent(location.pathname);
+  }, [location.pathname]);
+
+  const handleLogout = async () => {
+    try {
+      setLoggingOut(true);
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setLoggingOut(false);
+    }
+  };
 
   const handleMenuClick = (e) => {
-    console.log('click ', e);
     setCurrent(e.key);
+    if (e.key === 'logout') {
+      handleLogout();
+    } else {
+      navigate(e.key);
+    }
+  };
 
-    // Pass the selected menu item to the parent component
-    onSelectMenuItem(e.key);
+  const buildMenuItems = () => {
+    const items = [
+      getItem('Home', '/welcome', <HomeOutlined />),
+      getItem('Dashboard', '/dashboard', <WindowsOutlined />),
+      getItem('Profile', '/profile', <UserOutlined />),
+      getItem('Settings', '/settings', <SettingOutlined />),
+  // Future features
+  getItem('Projects', '/projects', <ProjectOutlined />),
+  getItem('Calendar', '/calendar', <CalendarOutlined />),
+  getItem('Notifications', '/notifications', <BellOutlined />),
+  getItem('Reports', '/reports', <BarChartOutlined />),
+  getItem('Analytics', '/analytics', <PieChartOutlined />),
+  getItem('Help Center', '/help', <QuestionCircleOutlined />),
+  getItem('Knowledge Base', '/knowledge', <BookOutlined />),
+  getItem('Time Tracking', '/timetracking', <ClockCircleOutlined />),
+  getItem('Surveys', '/surveys', <FormOutlined />),
+  getItem('Rewards', '/rewards', <GiftOutlined />),
+  getItem('Workflow Builder', 'workflow-builder', <ApartmentOutlined />),
+    ];
+
+    if (user?.role?.name?.toLowerCase() === 'admin') {
+      items.push(
+        getItem('HR Management', 'hr', <UsergroupAddOutlined />, [
+          getItem('Employee Profiles', '/users_setting', <UserOutlined />),
+          getItem('Leave Management', '/leaves', <UserOutlined />),
+        ])
+      );
+    }
+
+    items.push(
+      getItem('Chat', '/dash/chat', <MessageOutlined />),
+      getItem('Logout', 'logout', loggingOut ? <Spin size="small" /> : <LogoutOutlined />)
+    );
+
+    return items;
   };
 
   return (
-    <>
-      <Flex align='center' justify='center'>
-        <div className="logo"></div>
-      </Flex>
-      <Menu
-        onClick={handleMenuClick}
-        defaultSelectedKeys={['1']}
-        defaultOpenKeys={['sub1']}
-        mode="inline"
-        items={items}
-      />
-    </>
+    <Menu
+      onClick={handleMenuClick}
+      selectedKeys={[current]}
+      mode="inline"
+      items={buildMenuItems()}
+      style={{
+        height: '100%',
+        overflowY: 'auto',
+        maxWidth: '100%',
+        paddingTop: '64px', /* space for the trigger button / logo area */
+        paddingLeft: '8px',
+      
+        paddingRight: '8px',
+        boxSizing: 'border-box',
+        position: 'relative',
+      }}
+      className="responsive-sidebar"
+    />
   );
-}
+};
 
 export default Sidebar;
