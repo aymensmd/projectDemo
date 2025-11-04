@@ -27,6 +27,7 @@ import {
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import comunikcrm from '../assets/comunikcrm.png';
+import AnyNamecrm from '../assets/AnyNamecrm.png';
 import { useNavigate } from 'react-router-dom';
 import { useStateContext } from '../contexts/ContextProvider';
 import axios from '../axios';
@@ -102,6 +103,7 @@ const CustomHeader = () => {
       style={{ 
         width: 280,
         padding: 0,
+
         borderRadius: 8,
         backgroundColor: currentTheme.cardBg,
         borderColor: currentTheme.border,
@@ -305,7 +307,7 @@ const CustomHeader = () => {
         {/* Left Section - Logo */}
         <Flex align="center">
           <img 
-            src={comunikcrm} 
+            src={AnyNamecrm} 
             alt="Company Logo" 
             style={{ 
               height: 32,
@@ -313,6 +315,16 @@ const CustomHeader = () => {
               filter: theme === 'dark' ? 'brightness(0) invert(1)' : 'none'
             }} 
           />
+          <h1 style={{ 
+            margin: 0, 
+            color: currentTheme.textPrimary, 
+            fontSize: 20,
+            fontWeight: '600',
+             filter: theme === 'dark' ? 'brightness(0) invert(1)' : 'none'
+          }}>
+            AnyName CRM
+          </h1>
+          
         </Flex>
 
         {/* Right Section - Actions */}

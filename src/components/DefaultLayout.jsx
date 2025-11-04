@@ -7,7 +7,7 @@ import CustomHeader from '../global/CustomHeader';
 import '../app.css';
 import { theme as antdTheme } from 'antd';
 import { useStateContext } from '../contexts/ContextProvider';
-
+import crm from '../assets/crm.png';
 const { Sider, Content } = Layout;
 
 export default function DefaultLayout() {
@@ -35,7 +35,7 @@ export default function DefaultLayout() {
           style={{
             position: 'fixed',
             left: 0,
-            top: 0,
+            top: 50,
             bottom: 0,
             height: '100vh',
             overflow: 'auto',

@@ -23,7 +23,12 @@ import TimeTracking from './views/TimeTracking';
 import Surveys from './views/Surveys';
 import Rewards from './views/Rewards';
 import WorkflowBuilder from './views/WorkflowBuilder'; // Import WorkflowBuilder
-import React from 'react';
+import React, { Suspense } from 'react';
+
+// Lazy-load feature pages to reduce initial bundle size
+const Achievements = React.lazy(() => import('./views/Achievements'));
+const TaskManagement = React.lazy(() => import('./views/TaskManagement'));
+const Performance = React.lazy(() => import('./views/Performance'));
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -56,6 +61,30 @@ const router = createBrowserRouter([
       {
         path: '/dashboard',
         element: <Dashboard />
+      },
+      {
+        path: '/achievements',
+        element: (
+          <Suspense fallback={<div style={{ padding: 24 }}>Loading...</div>}>
+            <Achievements />
+          </Suspense>
+        )
+      },
+      {
+        path: '/tasks',
+        element: (
+          <Suspense fallback={<div style={{ padding: 24 }}>Loading...</div>}>
+            <TaskManagement />
+          </Suspense>
+        )
+      },
+      {
+        path: '/performance',
+        element: (
+          <Suspense fallback={<div style={{ padding: 24 }}>Loading...</div>}>
+            <Performance />
+          </Suspense>
+        )
       },
       {
         path: '/profile',

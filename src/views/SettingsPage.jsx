@@ -32,7 +32,7 @@ import {
 } from '@ant-design/icons';
 import { useStateContext } from '../contexts/ContextProvider';
 import axios from '../axios';
-import comunikcrm from '../assets/comunikcrm.png';
+import AnyNamecrm from '../assets/AnyNamecrm.png';
 
 const { Title, Text } = Typography;
 
@@ -137,7 +137,7 @@ const SettingsPage = () => {
       >
         {/* Profile */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 24, paddingBottom: 24, borderBottom: `1px solid ${colors.border}` }}>
-          <Avatar size={80} src={user.avatar || comunikcrm} style={{ backgroundColor: colors.primary, color: '#fff', fontSize: 32 }}>
+          <Avatar size={80} src={user.avatar || AnyNamecrm} style={{ backgroundColor: colors.primary, color: '#fff', fontSize: 32 }}>
             {user.name.charAt(0).toUpperCase()}
           </Avatar>
           <div>

@@ -14,7 +14,7 @@ import { useStateContext } from '../contexts/ContextProvider';
 import { motion } from 'framer-motion';
 import CountUp from 'react-countup';
 import './welcomePage.css';
-import logo from '../assets/comunikcrm.png';
+import logo from '../assets/AnyNamecrm.png';
 import { useNavigate } from 'react-router-dom';
 
 const { Title, Text, Paragraph } = Typography;
@@ -69,7 +69,8 @@ const WelcomePage = () => {
     {
       title: "Team Collaboration",
       content: "Connect with your team through our integrated messaging system",
-      color: '#52c41a'
+      color: '#52c41a',
+    
     },
     {
       title: "Performance Insights",
@@ -91,17 +92,20 @@ const WelcomePage = () => {
     {
       icon: <TrophyOutlined style={{ fontSize: 24 }} />,
       title: "Achievements",
-      description: "Track your milestones and accomplishments"
+      description: "Track your milestones and accomplishments",
+      path: '/achievements'
     },
     {
       icon: <CheckCircleOutlined style={{ fontSize: 24 }} />,
       title: "Task Management",
-      description: "Organize and prioritize your work"
+      description: "Organize and prioritize your work",
+      path: '/tasks'
     },
     {
       icon: <StarOutlined style={{ fontSize: 24 }} />,
       title: "Performance",
-      description: "Monitor your productivity metrics"
+      description: "Monitor your productivity metrics",
+      path: '/performance'
     }
   ];
 
@@ -170,7 +174,7 @@ const WelcomePage = () => {
           shape="round" 
           style={{ 
             marginTop: 16,
-            marginLeft: 30,
+           maxWidth: 150,
             backgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : undefined,
             color: theme === 'dark' ? 'white' : undefined
           }}
@@ -338,10 +342,12 @@ const WelcomePage = () => {
                     size="small" 
                     hoverable
                     className="feature-card"
+                    onClick={() => feature.path && navigate(feature.path)}
                     style={{
                       backgroundColor: colors.cardBg,
                       borderColor: colors.border,
-                      width: '100%'
+                      width: '100%',
+                      cursor: feature.path ? 'pointer' : 'default'
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}> 
@@ -470,7 +476,7 @@ const WelcomePage = () => {
           Empowering Teams, <span style={{ color: '#52c41a' }}>Transforming Work</span>
         </Title>
         <Paragraph style={{ fontSize: 20, maxWidth: 600, margin: '16px auto 32px', color: '#555' }}>
-          At <b>Comunik</b>, our mission is to streamline HR processes, foster collaboration, and drive business success through innovative digital solutions.
+          At <b>AnyName</b>, our mission is to streamline HR processes, foster collaboration, and drive business success through innovative digital solutions.
         </Paragraph>
         <Button type="primary" size="large" style={{ fontWeight: 600, boxShadow: '0 2px 8px #277dfe33' }} onClick={() => navigate('/dashboard')}>
           Get Started
@@ -486,7 +492,7 @@ const WelcomePage = () => {
       >
         <Title level={3} style={{ color: '#277dfe', marginBottom: 16 }}>Ready to Transform Your HR Experience?</Title>
         <Paragraph style={{ fontSize: 17, color: '#555', marginBottom: 24 }}>
-          Join hundreds of organizations who trust <b>Comunik</b> to power their HR operations and employee engagement.
+          Join hundreds of organizations who trust <b>AnyName</b> to power their HR operations and employee engagement.
         </Paragraph>
         <Button type="primary" size="large" style={{ fontWeight: 600, boxShadow: '0 2px 8px #277dfe33' }} onClick={() => navigate('/demo_request')}>
           Request a Demo

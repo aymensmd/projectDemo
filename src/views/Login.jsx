@@ -4,7 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useStateContext } from '../contexts/ContextProvider';
 import axios from 'axios';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
-import comunikcrm from '../assets/comunikcrm.png';
+import AnyNamecrm from '../assets/AnyNamecrm.png';
+import crm from '../assets/crm.png';
 import './login.css';
 
 export default function Login() {
@@ -44,8 +45,8 @@ export default function Login() {
       <div className="login-container">
         <Card className="login-card">
           <div className="login-header">
-            <img src={comunikcrm} alt="Comunik CRM" className="login-logo" />
-            <h1 className="login-title">Welcome to Comunik</h1>
+            <img src={AnyNamecrm} alt="AnyName CRM" className="login-logo" />
+            <h1 className="login-title">Welcome to AnyName</h1>
             <p className="login-subtitle">Your business communication hub</p>
           </div>
           
@@ -109,6 +110,7 @@ export default function Login() {
       <div className="animated-background">
         <div className="water-blob water-blob-1"></div>
         <div className="water-blob water-blob-2"></div>
+    
         <div className="water-blob water-blob-3"></div>
         <div className="water-blob water-blob-4"></div>
       </div>
