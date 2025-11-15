@@ -3,7 +3,7 @@ import {
   Badge, Button, Card, Drawer, Form, Input, Space, Table,
   DatePicker, Select, Popconfirm, Typography, Spin, App
 } from 'antd';
-import axios from 'axios';
+import axios from '../axios';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
 import { useStateContext } from '../contexts/ContextProvider';
@@ -30,14 +30,14 @@ const VacData = ({ setTotalVacationDays }) => {
     if (token && user?.id) {
       fetchVacations();
     } else {
-      message.error('Authentication required');
+      console.log('Skipping vacation fetch: missing token or user');
     }
   }, [token, user]);
 
   const fetchVacations = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/vacations/${user.id}`, {
+      const response = await axios.get(`/vacations?user_id=${user.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -45,12 +45,11 @@ const VacData = ({ setTotalVacationDays }) => {
         setVacationData(response.data);
         calculateTotalVacationDays(response.data);
       } else {
-        message.warning('No vacation data found');
+        console.log('No vacation data found');
         setVacationData([]);
       }
     } catch (error) {
       console.error('Failed to fetch vacations:', error);
-      message.error(error.response?.data?.message || 'Failed to fetch vacations');
       setVacationData([]);
     } finally {
       setLoading(false);
@@ -145,7 +144,7 @@ const VacData = ({ setTotalVacationDays }) => {
   const handleUpdateFormSubmit = async (values) => {
     try {
       const response = await axios.put(
-        `http://127.0.0.1:8000/api/vacations/${selectedVacation.id}`,
+        `/vacations/${selectedVacation.id}`,
         {
           ...values,
           start_date: values.start_date.format('YYYY-MM-DD'),

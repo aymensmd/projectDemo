@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Input, Button, message, Drawer, Form, Select, Space, Popconfirm, Typography, ConfigProvider } from 'antd';
+import { Card, Table, Input, Button, message, Drawer, Form, Select, Space, Popconfirm, Typography, ConfigProvider, Alert, Empty } from 'antd';
 import { SearchOutlined, PlusOutlined, FilterOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import axios from '../axios';
 import { useRealTimeData } from '../hooks/useRealTimeData';
 import { useStateContext } from '../contexts/ContextProvider';
 
@@ -18,7 +18,7 @@ const UserTable = () => {
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [form] = Form.useForm();
 
-  const { data: users, loading, error, refresh } = useRealTimeData('http://127.0.0.1:8000/api/employees');
+  const { data: users, loading, error, refresh } = useRealTimeData('/employees');
 
   // Theme styles
   const themeStyles = {
@@ -44,14 +44,13 @@ const UserTable = () => {
 
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:8000/api/departments');
+      const response = await axios.get('/departments');
       if (response.status === 200 && Array.isArray(response.data)) {
         setDepartmentOptions(response.data);
       } else {
         throw new Error('Invalid response format');
       }
     } catch (error) {
-      message.error('Failed to fetch departments. Please check the API endpoint.');
       console.error('Error fetching departments:', error);
     }
   };
@@ -70,7 +69,7 @@ const UserTable = () => {
         role_id: values.role,
       };
 
-      await axios.put(`http://127.0.0.1:8000/api/employees/${selectedUser.id}`, updatedData, {
+      await axios.put(`/employees/${selectedUser.id}`, updatedData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Accept': 'application/json',
@@ -81,7 +80,6 @@ const UserTable = () => {
       setDrawerVisible(false);
       refresh();
     } catch (error) {
-      message.error('Failed to update user');
       console.error('Update error:', error);
     }
   };
@@ -179,6 +177,22 @@ const UserTable = () => {
         <Title level={3} style={{ marginBottom: '20px', textAlign: 'center', color: colors.textPrimary }}>
           User Management
         </Title>
+        {error && (
+          <Alert 
+            message="Backend Error" 
+            description={`${error}. Please contact your administrator. Error details: Missing database table or endpoint issue.`}
+            type="error" 
+            showIcon 
+            closable
+            style={{ marginBottom: '16px' }} 
+          />
+        )}
+        {loading && users.length === 0 && (
+          <Empty 
+            description={error ? 'Failed to load users' : 'Loading users...'} 
+            style={{ marginTop: 32, marginBottom: 32 }} 
+          />
+        )}
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', gap: 8 }}>
           <Input
             placeholder="Search by name or email"

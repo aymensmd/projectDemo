@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Divider, Form, Input, Select, DatePicker, message, ConfigProvider } from 'antd';
-import axios from 'axios';
+import axios from '../axios';
 import dayjs from 'dayjs';
 import { useStateContext } from '../contexts/ContextProvider';
 import { useNavigate } from 'react-router-dom';
@@ -67,14 +67,15 @@ const { theme, token: contextToken, user } = useStateContext(); // Get user from
       if (!auth) return;
 
       try {
-        const response = await axios.post('http://127.0.0.1:8000/api/vacations', {
-          headers: {
-            Authorization: `Bearer ${auth.token}`,
-          },
+        // API spec: GET /vacations?user_id=X&status=pending
+        const response = await axios.get('/vacations', {
           params: {
             user_id: auth.userId,
             status: 'pending'
-          }
+          },
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+          },
         });
 
         setHasPendingVacation(response.data.length > 0);
@@ -86,16 +87,13 @@ const { theme, token: contextToken, user } = useStateContext(); // Get user from
         });
         
         if (error.response?.status === 401) {
-          message.error('Session expired. Please login again.');
           navigate('/login');
-        } else {
-          message.error(error.response?.data?.message || 'Failed to check pending vacations');
         }
       }
     };
 
     fetchPendingVacation();
-  }, [navigate, contextToken, user]); // Add dependencies
+  }, [navigate, contextToken, user]);
 
   const onFinish = async (values) => {
     const auth = verifyAuthentication();
@@ -109,13 +107,12 @@ const { theme, token: contextToken, user } = useStateContext(); // Get user from
     try {
       setLoading(true);
       
-      const response = await axios.post('http://127.0.0.1:8000/api/vacations', {
+      const response = await axios.post('/vacations', {
         type: values.dayOffType,
         start_date: values.startDate.format('YYYY-MM-DD'),
         end_date: values.endDate.format('YYYY-MM-DD'),
         reason: values.reason,
-        status: 'pending',
-        user_id: auth.userId
+        status: 'pending'
       }, {
         headers: {
           Authorization: `Bearer ${auth.token}`,

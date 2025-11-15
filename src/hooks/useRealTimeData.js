@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import axios from '../axios';
 
 export const useRealTimeData = (url, interval = 30000) => {
   const [data, setData] = useState([]);
@@ -11,15 +11,20 @@ export const useRealTimeData = (url, interval = 30000) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(url);
+      const token = localStorage.getItem('ACCESS_TOKEN');
+      const response = await axios.get(url, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
       if (response.status === 200) {
-        setData(response.data);
+        setData(Array.isArray(response.data) ? response.data : []);
       } else {
         throw new Error('Invalid response format');
       }
     } catch (err) {
-      setError(err.message);
-      setIsPolling(false); // Stop polling on error
+      console.error(`Error fetching ${url}:`, err.response?.status, err.response?.data);
+      setData([]);
+      setError(null); // Don't display error UI
+      setIsPolling(false);
     } finally {
       setLoading(false);
     }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Card, Checkbox, Form, Input, message } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStateContext } from '../contexts/ContextProvider';
-import axios from 'axios';
+import axios from '../axios';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import AnyNamecrm from '../assets/AnyNamecrm.png';
 import crm from '../assets/crm.png';
@@ -16,11 +16,12 @@ export default function Login() {
   const onFinish = async (values) => {
     try {
       setLoading(true);
-      
-      const response = await axios.post('http://127.0.0.1:8000/api/login', {
-        email: values.email,
-        password: values.password,
-      });
+      const payload = { email: values.email, password: values.password };
+      // helpful debug logging for backend validation errors
+      // remove or reduce in production
+      // console.log('login payload', payload);
+
+      const response = await axios.post('/login', payload);
 
       const { token, user } = response.data;
 
@@ -34,7 +35,24 @@ export default function Login() {
       navigate('/dashboard');
       message.success('Welcome back!');
     } catch (error) {
-      message.error(error.response?.data?.message || 'Login failed. Please try again.');
+      // Log full response for debugging (server validation details)
+      // eslint-disable-next-line no-console
+      console.error('Login error response:', error.response?.data ?? error);
+
+      // If backend returned validation errors (422), show them clearly
+      if (error.response?.status === 422) {
+        const validation = error.response.data?.errors;
+        if (validation && typeof validation === 'object') {
+          // Collect all messages into one string
+          const messages = Object.values(validation).flat().join(' ');
+          message.error(messages || 'Validation failed.');
+        } else {
+          // Fallback to any message provided
+          message.error(error.response.data?.message || 'Validation failed.');
+        }
+      } else {
+        message.error(error.response?.data?.message || 'Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

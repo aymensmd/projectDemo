@@ -188,6 +188,56 @@ const WelcomePage = () => {
 </Carousel>
       </motion.div>
 
+ {/* App Introduction */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.1, duration: 0.5 }}
+      >
+        <Card 
+          title={<Text style={{ color: colors.textPrimary }}>About Our Platform</Text>}
+          style={{ 
+            marginTop: 24,
+            backgroundColor: theme === 'dark' ? '#1f1f1f' : '#ffffff',
+            borderColor: colors.border
+          }}
+          styles={{ header: { borderColor: colors.border } }}
+        >
+          <Row gutter={[24, 24]} align="middle">
+            <Col xs={24} md={12}>
+              <Title level={4} style={{ marginBottom: 16, color: colors.textPrimary }}>
+                Your Productivity Powerhouse
+              </Title>
+              <Paragraph style={{ color: colors.textPrimary }}>
+                Our platform is designed to streamline your workflow, enhance collaboration, 
+                and provide actionable insights to boost your productivity.
+              </Paragraph>
+              <Paragraph style={{ color: colors.textPrimary }}>
+                With intuitive tools and real-time analytics, you can focus on what matters most - 
+                achieving your goals and driving results.
+              </Paragraph>
+              <Button type="primary" icon={<RocketOutlined />}>
+                Take the Tour
+              </Button>
+            </Col>
+            <Col xs={24} md={12}>
+              <div style={{ 
+                height: 250,
+                background: theme === 'dark' ? 'rgba(24, 144, 255, 0.05)' : 'rgba(24, 144, 255, 0.1)',
+                borderRadius: 8,
+                border: `1px dashed ${colors.primary}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: colors.primary
+              }}>
+                <Text>Platform Screenshot</Text>
+              </div>
+            </Col>
+          </Row>
+        </Card>
+      </motion.div>
+
       {/* Welcome Header */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -286,7 +336,7 @@ const WelcomePage = () => {
             backgroundColor: colors.cardBg,
             borderColor: colors.border
           }}
-          headStyle={{ borderColor: colors.border }}
+          styles={{ header: { borderColor: colors.border } }}
         >
           <Row gutter={[16, 16]}>
             {quickActions.map((action, index) => (
@@ -300,7 +350,7 @@ const WelcomePage = () => {
                       backgroundColor: colors.cardBg,
                       borderColor: colors.border
                     }}
-                    bodyStyle={{ textAlign: 'center' }}
+                    styles={{ body: { textAlign: 'center' } }}
                   >
                     <div style={{ 
                       fontSize: 32,
@@ -333,7 +383,7 @@ const WelcomePage = () => {
                 backgroundColor: colors.cardBg,
                 borderColor: colors.border
               }}
-              headStyle={{ borderColor: colors.border }}
+              styles={{ header: { borderColor: colors.border } }}
             >
               <div className="feature-grid">
                 {features.map((feature, index) => (
@@ -380,7 +430,7 @@ const WelcomePage = () => {
                 backgroundColor: colors.cardBg,
                 borderColor: colors.border
               }}
-              headStyle={{ borderColor: colors.border }}
+              styles={{ header: { borderColor: colors.border } }}
             >
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 {[1, 2, 3].map((item) => (
@@ -414,56 +464,7 @@ const WelcomePage = () => {
         </Col>
       </Row>
 
-      {/* App Introduction */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.1, duration: 0.5 }}
-      >
-        <Card 
-          title={<Text style={{ color: colors.textPrimary }}>About Our Platform</Text>}
-          style={{ 
-            marginTop: 24,
-            backgroundColor: theme === 'dark' ? '#1f1f1f' : '#ffffff',
-            borderColor: colors.border
-          }}
-          headStyle={{ borderColor: colors.border }}
-        >
-          <Row gutter={[24, 24]} align="middle">
-            <Col xs={24} md={12}>
-              <Title level={4} style={{ marginBottom: 16, color: colors.textPrimary }}>
-                Your Productivity Powerhouse
-              </Title>
-              <Paragraph style={{ color: colors.textPrimary }}>
-                Our platform is designed to streamline your workflow, enhance collaboration, 
-                and provide actionable insights to boost your productivity.
-              </Paragraph>
-              <Paragraph style={{ color: colors.textPrimary }}>
-                With intuitive tools and real-time analytics, you can focus on what matters most - 
-                achieving your goals and driving results.
-              </Paragraph>
-              <Button type="primary" icon={<RocketOutlined />}>
-                Take the Tour
-              </Button>
-            </Col>
-            <Col xs={24} md={12}>
-              <div style={{ 
-                height: 250,
-                background: theme === 'dark' ? 'rgba(24, 144, 255, 0.05)' : 'rgba(24, 144, 255, 0.1)',
-                borderRadius: 8,
-                border: `1px dashed ${colors.primary}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: colors.primary
-              }}>
-                <Text>Platform Screenshot</Text>
-              </div>
-            </Col>
-          </Row>
-        </Card>
-      </motion.div>
-
+     
       {/* Hero Section */}
       <motion.section
         initial={{ opacity: 0, y: -40 }}
@@ -475,7 +476,7 @@ const WelcomePage = () => {
         <Title level={1} style={{ color: '#277dfe', fontWeight: 700, marginBottom: 0 }}>
           Empowering Teams, <span style={{ color: '#52c41a' }}>Transforming Work</span>
         </Title>
-        <Paragraph style={{ fontSize: 20, maxWidth: 600, margin: '16px auto 32px', color: '#555' }}>
+        <Paragraph style={{ fontSize: 20, maxWidth: 800, margin: '16px auto 32px', color: '#555' }}>
           At <b>AnyName</b>, our mission is to streamline HR processes, foster collaboration, and drive business success through innovative digital solutions.
         </Paragraph>
         <Button type="primary" size="large" style={{ fontWeight: 600, boxShadow: '0 2px 8px #277dfe33' }} onClick={() => navigate('/dashboard')}>
@@ -488,7 +489,7 @@ const WelcomePage = () => {
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay: 0.3 }}
-        style={{ maxWidth: 900, margin: '40px auto 0', background: '#e6f7ff', borderRadius: 16, boxShadow: '0 2px 16px #0001', padding: 32, textAlign: 'center' }}
+        style={{ maxWidth: 1200, margin: '40px auto 0', background: '#e6f7ff', borderRadius: 16, boxShadow: '0 2px 16px #0001', padding: 32, textAlign: 'center' }}
       >
         <Title level={3} style={{ color: '#277dfe', marginBottom: 16 }}>Ready to Transform Your HR Experience?</Title>
         <Paragraph style={{ fontSize: 17, color: '#555', marginBottom: 24 }}>
@@ -504,7 +505,7 @@ const WelcomePage = () => {
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay: 0.4 }}
-        style={{ maxWidth: 900, margin: '40px auto 0', background: '#fff', borderRadius: 16, boxShadow: '0 2px 16px #0001', padding: 32 }}
+        style={{ maxWidth: 1200, margin: '40px auto 0',color: colors.textPrimary, borderRadius: 16, boxShadow: '0 2px 16px #0001', padding: 32 }}
       >
         <Title level={3} style={{ color: '#277dfe', marginBottom: 24 }}>Quick Tools</Title>
         <Row gutter={[16, 16]}>
@@ -524,7 +525,7 @@ const WelcomePage = () => {
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay: 0.5 }}
-        style={{ maxWidth: 900, margin: '40px auto 0', background: '#f0f5ff', borderRadius: 16, boxShadow: '0 2px 16px #0001', padding: 32 }}
+        style={{ maxWidth: 1200, margin: '40px auto 0', borderRadius: 16, boxShadow: '0 2px 16px #0001', padding: 32 }}
       >
         <Title level={3} style={{ color: '#1890ff', marginBottom: 24 }}>Latest News & Updates</Title>
         <ul style={{ padding: 0, listStyle: 'none' }}>
@@ -542,7 +543,7 @@ const WelcomePage = () => {
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay: 0.6 }}
-        style={{ maxWidth: 900, margin: '40px auto 32px', background: '#fff', borderRadius: 16, boxShadow: '0 2px 16px #0001', padding: 32 }}
+        style={{ maxWidth: 1200, margin: '40px auto 32px', borderRadius: 16, boxShadow: '0 2px 16px #0001', padding: 32 }}
       >
         <Title level={3} style={{ color: '#52c41a', marginBottom: 24 }}>Resources</Title>
         <Row gutter={[16, 16]}>

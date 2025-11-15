@@ -2,7 +2,7 @@ import { Button, Card, Drawer, Typography, Flex, message } from 'antd';
 import React, { useState, useEffect } from 'react';
 import CongeForm from '../Form/CongeForm';
 import VacData from '../data/VacData';
-import axios from 'axios';
+import axios from '../axios';
 import { useStateContext } from '../contexts/ContextProvider';
 
 const { Title, Text } = Typography;
@@ -41,19 +41,19 @@ const Banner = ({ userId }) => {
     fetchVacations();
     const interval = setInterval(fetchVacations, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [userId]);
 
   const fetchVacations = async () => {
     try {
       const token = localStorage.getItem('ACCESS_TOKEN');
-      const userId = localStorage.getItem('USER_ID');
+      const currentUserId = userId || localStorage.getItem('USER_ID');
 
-      if (!token) {
-        message.error('User is not authenticated');
+      if (!token || !currentUserId) {
+        console.log('Skipping vacation fetch: missing token or userId');
         return;
       }
 
-      const response = await axios.get(`http://127.0.0.1:8000/api/vacations/${userId}`, {
+      const response = await axios.get(`/vacations?user_id=${currentUserId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

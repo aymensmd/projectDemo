@@ -9,7 +9,7 @@ import {
   InfoCircleOutlined, MailOutlined, TeamOutlined, CalendarOutlined, 
   ClockCircleOutlined 
 } from '@ant-design/icons';
-import axios from 'axios';
+import axios from '../axios';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
 import { useStateContext } from '../contexts/ContextProvider';
@@ -221,7 +221,8 @@ const VacationComponent = () => {
   const fetchUserData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://127.0.0.1:8000/api/employees', {
+      // API spec: GET /employees returns users with vacations relationship loaded
+      const response = await axios.get('/employees', {
         headers: {
           Authorization: `Bearer ${currentUserToken}`,
         },
@@ -250,7 +251,7 @@ const VacationComponent = () => {
       setUserData(usersWithVacations);
     } catch (error) {
       console.error('Error fetching user data:', error);
-      message.error('Failed to fetch user data');
+      // Silently fail - don't show error UI for backend issues
     } finally {
       setLoading(false);
     }
@@ -469,12 +470,10 @@ const VacationComponent = () => {
     }
 
     try {
+      // API spec: PUT /vacations/{id} with status (normalized by API)
       await axios.put(
-        `http://127.0.0.1:8000/api/vacations/${selectedVacation.id}`, 
-        {
-          ...selectedVacation,
-          status: values.status
-        }, 
+        `/vacations/${selectedVacation.id}`, 
+        { status: values.status }, 
         {
           headers: {
             Authorization: `Bearer ${currentUserToken}`,

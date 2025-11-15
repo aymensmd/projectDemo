@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button, Divider, Form, Input, Select, Space, DatePicker, message, Row, Col } from 'antd';
-import axios from 'axios';
+import axios from '../axios';
+import moment from 'moment';
 
 const { Option } = Select;
-const { RangePicker } = DatePicker;
 
 const formItemLayout = {
   labelCol: {
@@ -21,54 +21,64 @@ const AddUser = () => {
 
   const onFinish = async (values) => {
     try {
-      // Set role_id based on the selected role
-      if (values.role === 'Admin') {
-        values.role_id = "1";
-      } else if (values.role === 'Moderator') {
-        values.role_id = "2";
-      }
+      // Map role names to IDs
+      const roleMap = {
+        'Admin': 1,
+        'Moderator': 2,
+        'Employee': 3,
+      };
 
-      switch(values.department_id) {
-        case '1' : values.department = 'voip'; break;
-        case '2' : values.department = 'sales'; break;
-        case '3' : values.department = 'contact'; break;
-        case '4' : values.department = 'helpdesk'; break;
-        case '5' : values.department = 'dashboard'; break;
-        case '6' : values.department = 'telecom'; break;
-      }
-
-      // Prepare the data to be sent
+      // Prepare data per API spec: exact field names and date format YYYY-MM-DD
       const userData = {
         name: values.name,
         email: values.email,
         password: values.password,
-        dateOfBirth: values.dateOfBirth,
+        dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
         genre: values.genre,
         adress: values.adress,
         phone_number: values.phone_number,
         sos_number: values.sos_number,
         social_situation: values.social_situation,
-        role_id: values.role_id,
-        department_id: values.department_id,
-        department: values.department
+        role_id: roleMap[values.role] || parseInt(values.role),
+        department_id: parseInt(values.department_id)
       };
 
-      // Send the form data to the API endpoint
-      const response = await axios.post('http://127.0.0.1:8000/api/store', userData);
+      console.log('Sending user registration:', userData);
+
+      // Send using project axios instance (has baseURL, CSRF token, auth headers)
+      const token = localStorage.getItem('ACCESS_TOKEN');
+      const response = await axios.post('/store', userData, {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+      });
 
       console.log('Registration successful', response.data);
       message.success('Registration successful');
       form.resetFields();
 
     } catch (error) {
-      console.error('Registration failed', error);
-      message.error('Registration failed');
+      console.error('Registration error:', error);
+      if (error.response) {
+        console.error('Error status:', error.response.status);
+        console.error('Error data:', error.response.data);
+      }
 
-      // Display the error message received from the server
-      if (error.response && error.response.data && error.response.data.message) {
-        message.error(`Registration failed: ${error.response.data.message}`);
+      // Handle 422 validation errors per API spec
+      if (error.response?.status === 422) {
+        const validation = error.response.data?.errors;
+        if (validation && typeof validation === 'object') {
+          const messages = Object.entries(validation)
+            .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+            .join('\n');
+          message.error(`Validation errors:\n${messages}`);
+        } else {
+          message.error(error.response.data?.message || 'Validation failed');
+        }
+      } else if (error.response?.data?.message) {
+        message.error(`Error: ${error.response.data.message}`);
       } else {
-        message.error('Registration failed');
+        message.error('Registration failed. Please try again.');
       }
     }
   };
@@ -235,6 +245,7 @@ const AddUser = () => {
               <Select style={{ width: '100%' }}>
                 <Option value="Admin">Admin</Option>
                 <Option value="Moderator">Moderator</Option>
+                <Option value="Employee">Employee</Option>
               </Select>
             </Form.Item>
           </Col>

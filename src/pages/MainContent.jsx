@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, notification, Modal, Avatar, Divider, Spin, ConfigProvider, Typography } from 'antd';
 import Banner from './Banner';
-import axios from 'axios';
+import axios from '../axios';
 import { useStateContext } from '../contexts/ContextProvider';
 
 const { Text } = Typography;
@@ -85,15 +85,11 @@ const MainContent = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:8000/api/events');
+      const response = await axios.get('/events');
       setEvents(response.data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching events:', error);
-      notification.error({
-        message: 'Error',
-        description: 'Failed to fetch events!',
-      });
       setLoading(false);
     }
   };
@@ -144,11 +140,13 @@ const MainContent = () => {
             display: 'flex',
             flexDirection: 'column'
           }}
-          bodyStyle={{ 
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            padding: 0
+          styles={{ 
+            body: {
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              padding: 0
+            }
           }}
         >
           <div style={{ 

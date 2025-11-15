@@ -307,8 +307,7 @@ const MessageComponent = () => {
         onClose={() => setMobileMenuVisible(false)}
         open={mobileMenuVisible}
         width={300}
-        bodyStyle={{ padding: 0 }}
-        headerStyle={{ borderBottom: '1px solid #f0f0f0' }}
+        styles={{ body: { padding: 0 }, header: { borderBottom: '1px solid #f0f0f0' } }}
       >
         <div style={{ padding: '16px' }}>
           <Input 

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, List, Input, Avatar, Typography, Divider, Badge, Tag } from 'antd';
 import { UserOutlined, TeamOutlined, BarChartOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import axios from '../axios';
 
 const { Search } = Input;
 const { Title, Text } = Typography;
@@ -15,7 +15,7 @@ const SideContent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/employees');
+        const response = await axios.get('/employees');
         setData(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -44,8 +44,10 @@ const SideContent = () => {
             <Text strong>Team Members</Text>
           </div>
         }
-        headStyle={{ borderBottom: 0 }}
-        bodyStyle={{ padding: '0 16px 16px' }}
+        styles={{ 
+          header: { borderBottom: 0 },
+          body: { padding: '0 16px 16px' }
+        }}
         className="side-content-card"
       >
         <Search
@@ -114,7 +116,9 @@ const SideContent = () => {
             <Text strong>Team Stats</Text>
           </div>
         }
-        headStyle={{ borderBottom: 0 }}
+        styles={{ 
+          header: { borderBottom: 0 }
+        }}
         className="side-content-card"
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

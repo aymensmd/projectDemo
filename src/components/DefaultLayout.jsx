@@ -35,14 +35,14 @@ export default function DefaultLayout() {
           style={{
             position: 'fixed',
             left: 0,
-            top: 50,
+           
             bottom: 0,
             height: '100vh',
             overflow: 'auto',
             zIndex: 1000,
           }}
         >
-          <div className="logo" />
+       
           <Button
             type="primary"
             size="large"

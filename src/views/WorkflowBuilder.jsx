@@ -388,7 +388,7 @@ export default function WorkflowBuilder() {
           onClose={() => setDrawerOpen(false)}
           open={drawerOpen}
           width={360}
-          bodyStyle={{ background: theme === 'dark' ? '#23272f' : '#fff', color: theme === 'dark' ? '#fff' : '#222' }}
+          styles={{ body: { background: theme === 'dark' ? '#23272f' : '#fff', color: theme === 'dark' ? '#fff' : '#222' } }}
         >
           {selectedNode ? (
             <div>

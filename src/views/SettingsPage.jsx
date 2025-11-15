@@ -133,7 +133,7 @@ const SettingsPage = () => {
     <div style={{ padding: 24, minHeight: '80vh', backgroundColor: theme === 'dark' ? '#141414' : '#f0f2f5' }}>
       <Card 
         style={{ maxWidth: 1200, margin: '0 auto', borderRadius: 8, backgroundColor: colors.cardBg, borderColor: colors.border }}
-        bodyStyle={{ padding: 24 }}
+        styles={{ body: { padding: 24 } }}
       >
         {/* Profile */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 24, paddingBottom: 24, borderBottom: `1px solid ${colors.border}` }}>

@@ -71,7 +71,7 @@ const CustomHeader = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/events');
+        const response = await axios.get('/events');
         setEventNotifications(response.data.slice(0, 5));
       } catch (error) {
         console.error('Error fetching events:', error);
@@ -360,10 +360,9 @@ const CustomHeader = () => {
           </Tooltip>
 
           <Dropdown
-            overlay={<NotificationMenu />}
+            dropdownRender={() => <NotificationMenu />}
             trigger={['click']}
             placement="bottomRight"
-            overlayStyle={{ zIndex: 1050 }}
           >
             <Badge count={eventNotifications.length} size="small">
               <Button
@@ -392,10 +391,9 @@ const CustomHeader = () => {
           </Tooltip>
 
           <Dropdown
-            overlay={<UserMenu />}
+            dropdownRender={() => <UserMenu />}
             trigger={['click']}
             placement="bottomRight"
-            overlayStyle={{ zIndex: 1050 }}
           >
             <Avatar
               size={36}
@@ -419,9 +417,11 @@ const CustomHeader = () => {
         onCancel={() => setIsHelpModalOpen(false)}
         footer={null}
         width={600}
-        bodyStyle={{ 
-          padding: 24,
-          backgroundColor: currentTheme.cardBg,
+        styles={{ 
+          body: {
+            padding: 24,
+            backgroundColor: currentTheme.cardBg,
+          }
         }}
       >
         <Flex vertical gap={24}>
@@ -461,9 +461,11 @@ const CustomHeader = () => {
         onCancel={() => setPopupVisible(false)}
         footer={null}
         width={600}
-        bodyStyle={{ 
-          padding: 24,
-          backgroundColor: currentTheme.cardBg,
+        styles={{ 
+          body: {
+            padding: 24,
+            backgroundColor: currentTheme.cardBg,
+          }
         }}
       >
         {popupEvent && (

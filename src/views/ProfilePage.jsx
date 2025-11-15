@@ -89,7 +89,7 @@ const ProfilePage = () => {
     const fetchUserEvents = async (userId) => {
       setLoadingEvents(true);
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/events');
+        const response = await axios.get('/events');
         const userEvents = response.data.filter(event => {
           const users = event.users || event.participants || [];
           return users.some(u => u.id === userId);
@@ -105,7 +105,7 @@ const ProfilePage = () => {
     const fetchUserVacations = async (userId) => {
       setLoadingVacations(true);
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/vacations/${userId}`);
+        const response = await axios.get(`/vacations?user_id=${userId}`);
         setVacations(response.data);
       } catch (error) {
         setVacations([]);
@@ -193,7 +193,7 @@ const ProfilePage = () => {
               maxWidth: 320, 
               margin: '0 auto' 
             }}
-            bodyStyle={{ padding: 12 }}
+            styles={{ body: { padding: 12 } }}
           >
             <div style={{ marginBottom: 2 }}>
               <FilePdfOutlined style={{ fontSize: 16, color: colors.primary }} />
