@@ -18,6 +18,24 @@ const UserTable = () => {
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [form] = Form.useForm();
 
+  // Add handleDelete for deleting a user
+  const handleDelete = async (userId) => {
+    try {
+      const token = localStorage.getItem('ACCESS_TOKEN');
+      await axios.delete(`/employees/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+      });
+      message.success('User deleted successfully');
+      refresh();
+    } catch (error) {
+      message.error('Failed to delete user');
+      console.error('Delete error:', error);
+    }
+  };
+
   const { data: users, loading, error, refresh } = useRealTimeData('/employees');
 
   // Theme styles

@@ -292,18 +292,24 @@ const CustomHeader = () => {
   return (
     <>
       <Flex
-        align="center"
-        style={{
-          height: 64,
-          padding: '0 24px',
-          backgroundColor: currentTheme.headerBg,
-          borderBottom: `1px solid ${currentTheme.border}`,
-          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100
-        }}
-      >
+  align="center"
+  style={{
+    height: 64,
+    padding: '0 24px',
+    background: theme === 'light'
+      ? 'rgba(255, 255, 255, 0.25)'
+      : 'rgba(20, 20, 20, 0.35)',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
+    borderBottom: `1px solid rgba(255, 255, 255, 0.15)`,
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+    position: 'sticky',
+    top: 0,
+    zIndex: 100,
+    borderRadius: '0 0 12px 12px'
+  }}
+>
+
         {/* Left Section - Logo */}
         <Flex align="center">
           <img 

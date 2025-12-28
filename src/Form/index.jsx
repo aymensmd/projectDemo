@@ -226,12 +226,10 @@ const AddUser = () => {
               rules={[{ required: true, message: 'Please select a department!' }]}
             >
               <Select style={{ width: '100%' }}>
-                <Option value="1">VoIP</Option>
-                <Option value="2">Sales</Option>
-                <Option value="3">Contact</Option>
-                <Option value="4">Helpdesk</Option>
-                <Option value="5">Dashboard</Option>
-                <Option value="6">Telecom</Option>
+                <Option value="1">dev</Option>
+                <Option value="2">assistant</Option>
+                <Option value="3">Administration</Option>
+    
               </Select>
             </Form.Item>
           </Col>

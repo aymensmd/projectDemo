@@ -105,9 +105,8 @@ function UserSettingView({ onSelectMenuItem }) {
             marginBottom: 16,
             padding: '0 24px',
             height: 64,
-            position: 'sticky',
             top: 0,
-            zIndex: 100
+            
           }}
         >
           <Menu
@@ -135,7 +134,7 @@ function UserSettingView({ onSelectMenuItem }) {
         {/* Content Area */}
         <Content
           style={{
-            padding: '24px',
+            padding: '0px',
             margin: 0,
             minHeight: 280,
           }}
@@ -143,7 +142,7 @@ function UserSettingView({ onSelectMenuItem }) {
           <div style={{
             background: colors.bgContainer,
             borderRadius: 8,
-            padding: 24,
+            padding: 0,
             minHeight: 'calc(100vh - 180px)',
             boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
             border: `1px solid ${colors.border}`

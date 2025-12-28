@@ -1,16 +1,29 @@
-import React, { useState } from 'react';
-import { Typography, Card, List, Button, Modal, Radio, message } from 'antd';
+
+import React, { useEffect, useState } from 'react';
+import { Typography, Card, List, Button, Modal, Radio, message, Spin } from 'antd';
+import axios from '../axios';
 
 const { Title } = Typography;
 
-const mockSurveys = [
-  { id: 1, title: 'Employee Engagement', questions: ['Satisfied with work-life balance?'] },
-  { id: 2, title: 'Workplace Safety', questions: ['Do you feel safe at workplace?'] }
-];
-
 const Surveys = () => {
+  const [surveys, setSurveys] = useState([]);
   const [openSurvey, setOpenSurvey] = useState(null);
   const [answer, setAnswer] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSurveys = async () => {
+      try {
+        const response = await axios.get('/surveys');
+        setSurveys(response.data);
+      } catch (error) {
+        message.error('Failed to load surveys');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSurveys();
+  }, []);
 
   const take = (survey) => setOpenSurvey(survey);
   const submit = () => {
@@ -23,14 +36,16 @@ const Surveys = () => {
     <div style={{ padding: 24 }}>
       <Title level={2}>Surveys</Title>
       <Card style={{ marginTop: 16 }}>
-        <List
-          dataSource={mockSurveys}
-          renderItem={s => (
-            <List.Item actions={[<Button onClick={() => take(s)}>Take Survey</Button>]}> 
-              <List.Item.Meta title={s.title} description={`${s.questions.length} question(s)`} />
-            </List.Item>
-          )}
-        />
+        {loading ? <Spin /> : (
+          <List
+            dataSource={surveys}
+            renderItem={s => (
+              <List.Item actions={[<Button onClick={() => take(s)}>Take Survey</Button>]}> 
+                <List.Item.Meta title={s.title} description={`${s.questions.length} question(s)`} />
+              </List.Item>
+            )}
+          />
+        )}
       </Card>
 
       <Modal title={openSurvey?.title} open={!!openSurvey} onCancel={() => setOpenSurvey(null)} onOk={submit} okText="Submit">

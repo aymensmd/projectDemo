@@ -107,7 +107,7 @@ const EmployeViewComponent = () => {
       }}
     >
       <Content className="content">
-        <Card style={{ margin: 16, padding: 24, background: colors.cardBg }} loading={loading}>
+        <Card style={{ margin: 16, padding: 0, background: colors.cardBg }} loading={loading}>
           <Title level={3} style={{ marginBottom: 0, color: colors.textPrimary }}>Gestion des employés</Title>
           <Text type="secondary" style={{ fontSize: 16, color: colors.textSecondary }}>
             Ajoutez, modifiez, filtrez, exportez et consultez les informations des employés.
@@ -115,7 +115,7 @@ const EmployeViewComponent = () => {
           <Divider />
           <Row gutter={[32, 32]}>
             <Col xs={24} md={16}>
-              <div style={{ background: colors.statsBg, borderRadius: 12, padding: 24, boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)' }}>
+              <div style={{ background: colors.statsBg, borderRadius: 12, padding: 10, boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <div style={{ flex: 1 }} />
                   <div style={{ display: 'flex', gap: 12 }}>

@@ -144,14 +144,8 @@ const MessageComponent = () => {
 
   const getRandomReply = () => {
     const replies = [
-      "Sounds good!",
-      "I'll get back to you on that.",
-      "Thanks for letting me know.",
-      "Can we discuss this later?",
-      "I appreciate your message!",
-      "Let me think about it.",
-      "That's interesting.",
-      "Got it, thanks!"
+      "barra nayk 3asba",
+      
     ];
     return replies[Math.floor(Math.random() * replies.length)];
   };
